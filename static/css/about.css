@@ -4,14 +4,16 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 80px; /* More space between main sections */
+    gap: 80px;
+    /* More space between main sections */
 }
 
 
 
 /* Profile Section */
 :root {
-    --accent-color-rgb: 0, 169, 255; /* RGB values for #00A9FF */
+    --accent-color-rgb: 0, 169, 255;
+    /* RGB values for #00A9FF */
 }
 
 [data-theme="light"] {
@@ -43,7 +45,7 @@
     border-radius: 16px;
     overflow: hidden;
     border: 3px solid var(--card-border);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .profile-image-wrapper img {
@@ -162,18 +164,23 @@
     color: var(--accent-color);
     transform: translateY(-2px);
 }
+
 .profile-content .page-header {
     text-align: left;
     align-items: flex-start;
     margin-bottom: 20px;
 }
+
 .profile-content .page-header h1 {
-    margin-bottom: 10px; /* Inherits other styles from base.css h1 */
+    margin-bottom: 10px;
+    /* Inherits other styles from base.css h1 */
 }
+
 .details-from-cms {
     font-size: 16px;
     line-height: 1.8;
 }
+
 /* Style the content coming from TinyMCE */
 .details-from-cms ul {
     list-style: none;
@@ -182,12 +189,15 @@
     flex-direction: column;
     gap: 15px;
 }
+
 .details-from-cms li {
     padding-left: 25px;
     position: relative;
 }
+
 .details-from-cms li::before {
-    content: '\f058'; /* Font Awesome checkmark icon */
+    content: '\f058';
+    /* Font Awesome checkmark icon */
     font-family: 'Font Awesome 6 Free';
     font-weight: 900;
     position: absolute;
@@ -195,6 +205,7 @@
     top: 4px;
     color: var(--accent-color);
 }
+
 .details-from-cms strong {
     color: var(--title-color);
     font-weight: 600;
@@ -207,6 +218,7 @@
     gap: 30px;
     width: 100%;
 }
+
 .action-card {
     text-align: center;
     display: flex;
@@ -215,15 +227,19 @@
     gap: 15px;
     padding: 30px;
 }
+
 .action-icon {
     font-size: 36px;
     color: var(--accent-color);
     margin-bottom: 10px;
 }
+
 /* .action-card h3 inherits from base.css h3 styles */
 .action-card p {
-    flex-grow: 1; /* Pushes button to the bottom */
+    flex-grow: 1;
+    /* Pushes button to the bottom */
 }
+
 .action-card .outline-btn {
     margin-top: auto;
     width: 80%;
@@ -238,44 +254,49 @@
         flex-direction: column;
         text-align: center;
     }
+
     .profile-content .page-header {
         align-items: center;
     }
+
     .details-from-cms li {
-        text-align: left; /* Keep list items aligned left */
+        text-align: left;
+        /* Keep list items aligned left */
     }
+
     .action-grid {
         grid-template-columns: 1fr;
     }
 }
+
 @media (max-width: 768px) {
     /* Typography inherits from base.css responsive styles */
-    
+
     /* Profile Section Responsive */
     .profile-section {
         flex-direction: column;
         gap: 30px;
         align-items: center;
     }
-    
+
     .profile-left-column {
         max-width: 280px;
         align-items: center;
     }
-    
+
     .profile-image-wrapper {
         max-width: 200px;
     }
-    
+
     .profile-info-card {
         width: 100%;
         text-align: center;
     }
-    
+
     .profile-badge {
         margin: 0 auto;
     }
-    
+
     .profile-social {
         justify-content: center;
     }
@@ -289,6 +310,7 @@
     align-items: center;
     gap: 15px;
 }
+
 .section-title p {
     max-width: 800px;
 }
@@ -301,22 +323,6 @@
     width: 100%;
 }
 
-/* Base Card Styles */
-.card {
-    background-color: var(--card-bg);
-    border: 1px solid var(--card-border); 
-    border-radius: 16px;
-    padding: 25px;
-    transition: all 0.3s ease-in-out;
-    width: 100%;
-}
-
-.card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 10px 25px var(--card-shadow);
-    border-color: var(--card-border-hover);
-}
-
 /* FAQ Section */
 .faq-section {
     width: 100%;
@@ -325,12 +331,44 @@
     gap: 40px !important;
 }
 
-.faq-card { cursor: pointer; }
-.faq-question { display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: 600; color: var(--title-color); }
-.faq-icon { transition: transform 0.3s ease; color: var(--accent-color); }
-.faq-card.active .faq-icon { transform: rotate(45deg); }
-.faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding-top 0.4s ease-out, margin-top 0.4s ease-out; padding-top: 0; margin-top: 0; border-left: 3px solid var(--card-border); padding-left: 15px; }
-.faq-card.active .faq-answer { margin-top: 20px; padding-top: 5px; max-height: 200px; border-left-color: var(--accent-color); }
+.faq-card {
+    cursor: pointer;
+}
+
+.faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--title-color);
+}
+
+.faq-icon {
+    transition: transform 0.3s ease;
+    color: var(--accent-color);
+}
+
+.faq-card.active .faq-icon {
+    transform: rotate(45deg);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out, padding-top 0.4s ease-out, margin-top 0.4s ease-out;
+    padding-top: 0;
+    margin-top: 0;
+    border-left: 3px solid var(--card-border);
+    padding-left: 15px;
+}
+
+.faq-card.active .faq-answer {
+    margin-top: 20px;
+    padding-top: 5px;
+    max-height: 200px;
+    border-left-color: var(--accent-color);
+}
 
 /* FAQ Show More Functionality */
 .faq-hidden {

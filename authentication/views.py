@@ -7,10 +7,28 @@ from django.views import View
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode, url_has_allowed_host_and_scheme
 from django.utils.encoding import force_bytes, force_str
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from django.contrib.auth.password_validation import validate_password
+from django.views.decorators.http import require_POST
+from django.utils.decorators import method_decorator
+from django_ratelimit.decorators import ratelimit
+
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def _safe_next_url(request):
+    """Validate and return next_url from session, falling back to '/'."""
+    next_url = request.session.pop("next_url", "/")
+    if url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+        return next_url
+    return "/"
 
 
 class SignupView(View):
@@ -22,6 +40,7 @@ class SignupView(View):
         request.session["next_url"] = next_url
         return render(request, "authentication/user-signup.html")
 
+    @method_decorator(ratelimit(key="ip", rate="5/m", method="POST", block=True))
     def post(self, request):
         name = request.POST.get("name", "").strip()
         email = request.POST.get("email", "").strip().lower()
@@ -32,14 +51,19 @@ class SignupView(View):
             messages.error(request, "All fields are required.")
             return render(request, "authentication/user-signup.html")
 
-        # Validate email format
-        if "@" not in email or "." not in email.split("@")[1]:
+        # Validate email format using Django's validator
+        try:
+            validate_email(email)
+        except ValidationError:
             messages.error(request, "Please enter a valid email address.")
             return render(request, "authentication/user-signup.html")
 
-        # Validate password length
-        if len(password) < 8:
-            messages.error(request, "Password must be at least 8 characters long.")
+        # Validate password using Django's password validators
+        try:
+            validate_password(password)
+        except ValidationError as e:
+            for error in e.messages:
+                messages.error(request, error)
             return render(request, "authentication/user-signup.html")
 
         # Check if user already exists
@@ -56,26 +80,20 @@ class SignupView(View):
                 first_name=name,
             )
 
-            # Verify the user was created properly
-            if not user or not user.check_password(password):
-                raise Exception("User creation verification failed")
-
             # Log the user in immediately
             login(request, user)
             messages.success(
                 request, f"Welcome {name}! I'm thrilled to have you join me here."
             )
 
-            # Redirect to the original page or home
-            next_url = request.session.get("next_url", "/")
-            if "next_url" in request.session:
-                del request.session["next_url"]
-            return redirect(next_url)
+            # Redirect to the original page or home (safe redirect)
+            return redirect(_safe_next_url(request))
 
-        except Exception as e:
+        except Exception:
+            logger.exception("Error creating user account for %s", email)
             messages.error(
                 request,
-                f"I encountered an error creating your account: {str(e)}. Please try again.",
+                "An error occurred creating your account. Please try again.",
             )
             return render(request, "authentication/user-signup.html")
 
@@ -89,6 +107,7 @@ class LoginView(View):
         request.session["next_url"] = next_url
         return render(request, "authentication/user-login.html")
 
+    @method_decorator(ratelimit(key="ip", rate="10/m", method="POST", block=True))
     def post(self, request):
         email = request.POST.get("email", "").strip().lower()
         password = request.POST.get("password", "").strip()
@@ -116,11 +135,8 @@ class LoginView(View):
                     request, f"Welcome back {user.first_name or user.username}!"
                 )
 
-                # Redirect to the original page or home
-                next_url = request.session.get("next_url", "/")
-                if "next_url" in request.session:
-                    del request.session["next_url"]
-                return redirect(next_url)
+                # Redirect to the original page or home (safe redirect)
+                return redirect(_safe_next_url(request))
             else:
                 messages.error(
                     request,
@@ -138,6 +154,7 @@ class ForgotPasswordView(View):
     def get(self, request):
         return render(request, "authentication/password-forgot.html")
 
+    @method_decorator(ratelimit(key="ip", rate="3/m", method="POST", block=True))
     def post(self, request):
         email = request.POST.get("email", "").strip().lower()
 
@@ -158,12 +175,13 @@ class ForgotPasswordView(View):
             # Create reset link
             reset_link = request.build_absolute_uri(
                 reverse(
-                    "auth_app:reset_password", kwargs={"uidb64": uid, "token": token}
+                    "authentication:reset_password", kwargs={"uidb64": uid, "token": token}
                 )
             )
 
-            # For development, we'll also print the reset link to console
-            print(f"Password reset link for {email}: {reset_link}")
+            # Log reset link in development only
+            if settings.DEBUG:
+                logger.debug("Password reset link for %s: %s", email, reset_link)
 
             # Prepare email context
             context = {
@@ -189,17 +207,16 @@ class ForgotPasswordView(View):
                     recipient_list=[email],
                     fail_silently=False,
                 )
-                print(f"Password reset email sent to {email}")
+                logger.info("Password reset email sent to %s", email)
             except Exception as email_error:
-                print(f"Failed to send email: {email_error}")
+                logger.error("Failed to send email to %s: %s", email, email_error)
                 # Continue anyway - user can still use the printed link in development
 
             messages.success(
                 request,
-                "If an account with this email exists, I'll send you a password reset link shortly. "
-                "Check the console output for the reset link in development mode.",
+                "If an account with this email exists, you'll receive a password reset link shortly.",
             )
-            return redirect("auth_app:login")
+            return redirect("authentication:login")
 
         except User.DoesNotExist:
             # Don't reveal that the user doesn't exist for security
@@ -207,9 +224,9 @@ class ForgotPasswordView(View):
                 request,
                 "If an account with this email exists, I'll send you a password reset link shortly.",
             )
-            return redirect("auth_app:login")
+            return redirect("authentication:login")
         except Exception as e:
-            print(f"Password reset error: {e}")
+            logger.exception("Password reset error")
             messages.error(
                 request,
                 "I encountered an error processing your password reset request. Please try again later.",
@@ -235,11 +252,11 @@ class ResetPasswordView(View):
                 return render(request, "authentication/password-reset.html", context)
             else:
                 messages.error(request, "Invalid or expired reset link.")
-                return redirect("auth_app:forgot_password")
+                return redirect("authentication:forgot_password")
 
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             messages.error(request, "Invalid reset link.")
-            return redirect("auth_app:forgot_password")
+            return redirect("authentication:forgot_password")
 
     def post(self, request, uidb64, token):
         try:
@@ -248,7 +265,7 @@ class ResetPasswordView(View):
 
             if not default_token_generator.check_token(user, token):
                 messages.error(request, "Invalid or expired reset link.")
-                return redirect("auth_app:forgot_password")
+                return redirect("authentication:forgot_password")
 
             password = request.POST.get("password", "").strip()
             confirm_password = request.POST.get("confirm_password", "").strip()
@@ -259,13 +276,17 @@ class ResetPasswordView(View):
                 context = {"uidb64": uidb64, "token": token, "user": user}
                 return render(request, "authentication/password-reset.html", context)
 
-            if len(password) < 8:
-                messages.error(request, "Password must be at least 8 characters long.")
+            if password != confirm_password:
+                messages.error(request, "Passwords do not match.")
                 context = {"uidb64": uidb64, "token": token, "user": user}
                 return render(request, "authentication/password-reset.html", context)
 
-            if password != confirm_password:
-                messages.error(request, "Passwords do not match.")
+            # Validate password using Django's password validators
+            try:
+                validate_password(password, user=user)
+            except ValidationError as e:
+                for error in e.messages:
+                    messages.error(request, error)
                 context = {"uidb64": uidb64, "token": token, "user": user}
                 return render(request, "authentication/password-reset.html", context)
 
@@ -277,19 +298,21 @@ class ResetPasswordView(View):
                 request,
                 "Your password has been reset successfully. You can now sign in.",
             )
-            return redirect("auth_app:login")
+            return redirect("authentication:login")
 
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             messages.error(request, "Invalid reset link.")
-            return redirect("auth_app:forgot_password")
+            return redirect("authentication:forgot_password")
 
 
 class LogoutView(View):
-    """Handle user logout."""
+    """Handle user logout. POST only to prevent CSRF-via-GET."""
 
     def get(self, request):
-        return self.post(request)
+        # Show a confirmation page instead of logging out via GET
+        return render(request, "authentication/user-login.html")
 
+    @method_decorator(require_POST)
     def post(self, request):
         logout(request)
         messages.success(request, "You have been successfully logged out.")

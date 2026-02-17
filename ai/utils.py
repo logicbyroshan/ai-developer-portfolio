@@ -85,7 +85,7 @@ def get_portfolio_context():
         
         context_data['name'] = "Roshan Damor"
         if config:
-            context_data['bio'] = config.about_me or 'Full-Stack Developer and AI Enthusiast'
+            context_data['bio'] = 'Full-Stack Developer and AI Enthusiast'
             context_data['email'] = config.email or 'contact@roshandamor.me'
         else:
             context_data['bio'] = 'Full-Stack Developer and AI Enthusiast'

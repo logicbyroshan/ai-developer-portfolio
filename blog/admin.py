@@ -45,7 +45,7 @@ class BlogAdmin(admin.ModelAdmin):
     fieldsets = (
         (
             "📝 Content",
-            {"fields": ("title", "slug", "summary"), "classes": ("wide",)},
+            {"fields": ("title", "slug", "summary", "content"), "classes": ("wide",)},
         ),
         ("🖼️ Media", {"fields": ("cover_image", "cover_preview"), "classes": ("wide",)}),
         ("🏷️ Categorization", {"fields": ("categories",), "classes": ("wide",)}),
@@ -115,7 +115,7 @@ class CommentAdmin(admin.ModelAdmin):
         (
             "💬 Comment Details",
             {
-                "fields": ("post", "author_name", "author_email", "body"),
+                "fields": ("post", "author_name", "body"),
                 "classes": ("wide",),
             },
         ),
@@ -150,7 +150,7 @@ class CommentAdmin(admin.ModelAdmin):
     approval_status.short_description = "Status"
 
     def like_count(self, obj):
-        count = obj.likes.count()
+        count = obj.user_likes.count()
         return format_html(
             '<span style="background: #e83e8c; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">❤️ {}</span>',
             count,
@@ -193,9 +193,6 @@ class CommentLikeAdmin(admin.ModelAdmin):
 
     # Make it read-only since this is user interaction data
     def has_add_permission(self, request):
-        return False
-
-    def has_change_permission(self, request, obj=None):
         return False
 
     def has_change_permission(self, request, obj=None):

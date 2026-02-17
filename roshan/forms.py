@@ -103,7 +103,6 @@ class ManualTrackForm(forms.ModelForm):
             "album",
             "audio_file",
             "youtube_url",
-            "spotify_url",
             "apple_music_url",
             "track_number",
         ]
@@ -135,12 +134,6 @@ class ManualTrackForm(forms.ModelForm):
                 attrs={
                     "class": "form-control",
                     "placeholder": "https://youtube.com/watch?v=...",
-                }
-            ),
-            "spotify_url": forms.URLInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "https://open.spotify.com/track/...",
                 }
             ),
             "apple_music_url": forms.URLInput(

@@ -8,7 +8,13 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY", "generate-a-new-secret-key-for-production")
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    from django.core.management.utils import get_random_secret_key
+    if os.getenv("DEBUG", "False").lower() == "true":
+        SECRET_KEY = get_random_secret_key()
+    else:
+        raise ValueError("SECRET_KEY environment variable is required in production")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
@@ -34,11 +40,6 @@ if env_hosts:
 
 # API Keys and External Services
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
-SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
-SPOTIFY_REDIRECT_URI = os.getenv(
-    "SPOTIFY_REDIRECT_URI", "https://roshandamor.me/music/admin/spotify-callback/"
-)
 TINYMCE_API_KEY = os.getenv("TINYMCE_API_KEY", "")
 
 INSTALLED_APPS = [
@@ -114,7 +115,7 @@ else:
             "PORT": os.getenv("MYSQL_PORT", "3306"),
             "OPTIONS": {
                 "charset": "utf8mb4",
-                "init_command": "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci', sql_mode='STRICT_TRANS_TABLES'",
+                "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
             },
         }
     }
@@ -217,31 +218,21 @@ MESSAGE_TAGS = {
     messages.ERROR: "danger",
 }
 
-# External API Configuration
-SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID", "")
-SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET", "")
-SPOTIFY_REDIRECT_URI = os.getenv(
-    "SPOTIFY_REDIRECT_URI", "https://roshandamor.me/music/admin/spotify-callback/"
-)
-
 # Security Settings for Production
 if not DEBUG:
     # HTTPS and Security
-    SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = "DENY"
     SECURE_HSTS_SECONDS = 31536000  # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+    SECURE_SSL_REDIRECT = True
 
     # Session Security
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
     CSRF_COOKIE_HTTPONLY = True
-
-    # Force HTTPS redirects (optional for cPanel)
-    # SECURE_SSL_REDIRECT = True
 
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = [

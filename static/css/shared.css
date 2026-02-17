@@ -1,0 +1,534 @@
+/* ==========================================================================
+   SHARED COMPONENTS CSS
+   Extracted from duplicated blocks across page-specific CSS files.
+   Include this after base.css and before page-specific CSS.
+   ========================================================================== */
+
+/* ========================= PAGE TOOLBAR ========================= */
+.page-toolbar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 15px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+}
+
+/* ========================= CATEGORIES SCROLLER ========================= */
+.categories-scroller {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+    flex-grow: 1;
+}
+
+.categories-scroller .scroll-btn {
+    background: transparent;
+    border: 1px solid var(--card-border);
+    color: var(--paragraph-color);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.categories-scroller .scroll-btn:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+}
+
+.categories-list {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.categories-list::-webkit-scrollbar {
+    display: none;
+}
+
+.category-badge {
+    background-color: transparent;
+    border: 1px solid var(--card-border);
+    color: var(--paragraph-color);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.category-badge:hover,
+.category-badge.active {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+}
+
+/* ========================= SORT DROPDOWN ========================= */
+.sort-dropdown {
+    position: relative;
+}
+
+#sort-button {
+    background: transparent;
+    border: 1px solid var(--card-border);
+    color: var(--title-color);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    min-width: fit-content;
+}
+
+#sort-button:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+#sort-items {
+    position: absolute;
+    top: 110%;
+    right: 0;
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    width: 180px;
+    z-index: 10;
+    list-style: none;
+    padding: 8px;
+    display: none;
+}
+
+#sort-items.show {
+    display: block;
+}
+
+#sort-items a {
+    display: block;
+    padding: 8px 12px;
+    color: var(--paragraph-color);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+#sort-items a:hover {
+    background-color: rgba(0, 169, 255, 0.1);
+    color: var(--accent-color);
+}
+
+/* ========================= DETAIL PAGE LAYOUT ========================= */
+.extram {
+    gap: 40px;
+}
+
+.detail-page-container {
+    width: 100%;
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+.detail-main-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 35px;
+    overflow-wrap: break-word;
+}
+
+.detail-sidebar {
+    width: 320px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* ========================= AUTHOR INFO ========================= */
+.author-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.author-info img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid var(--card-border);
+}
+
+.author-info h4 {
+    font-size: 18px;
+    color: var(--title-color);
+    margin: 0;
+}
+
+.author-info p {
+    font-size: 14px;
+    margin: 0;
+    color: var(--paragraph-color);
+}
+
+/* ========================= COMMENTS SECTION ========================= */
+.comments-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 40px;
+}
+
+.comments-section h2 {
+    font-size: 32px;
+}
+
+.comment-form {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+    padding: 20px;
+}
+
+.comment-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, var(--accent-color), #ff6b6b);
+}
+
+.comment-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.comment-form .form-content {
+    flex-grow: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.comment-form textarea {
+    width: 100%;
+    background: var(--bg-gradient-mid);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 16px;
+    color: var(--title-color);
+    resize: vertical;
+    min-height: 40px;
+}
+
+.comment-form textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.comment-form .filled-btn {
+    align-self: flex-end;
+}
+
+.comment-auth-prompt {
+    background: var(--bg-gradient-mid);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-prompt-content p {
+    color: var(--paragraph-color);
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.auth-buttons .filled-btn,
+.auth-buttons .outline-btn {
+    padding: 12px 24px;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.comment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.comment-item {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+    padding: 20px;
+}
+
+.comment-item.hidden {
+    display: none;
+}
+
+.comment-body {
+    flex-grow: 1;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.comment-header h5 {
+    font-size: 16px;
+    color: var(--title-color);
+    font-weight: 600;
+}
+
+.comment-header span {
+    font-size: 13px;
+    color: var(--paragraph-color);
+}
+
+.comment-body p {
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+.comment-actions {
+    margin-top: 15px;
+}
+
+.like-btn {
+    background: none;
+    border: 1px solid var(--card-border);
+    color: var(--paragraph-color);
+    padding: 5px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.like-btn i {
+    margin-right: 6px;
+}
+
+.like-btn:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+.like-btn.active {
+    background-color: rgba(255, 82, 82, 0.1);
+    border-color: #ff5252;
+    color: #ff5252;
+}
+
+#load-more-comments {
+    margin: 20px auto 0;
+}
+
+/* ========================= PROJECT MEDIA & YOUTUBE ========================= */
+.project-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: var(--card-background);
+}
+
+.project-media .project-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+    border-radius: 10px;
+}
+
+.project-media .project-image.placeholder {
+    background-color: var(--card-border);
+}
+
+.youtube-video-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.youtube-video-container iframe {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+}
+
+/* ========================= CUSTOM SCROLLBAR ========================= */
+/* Thin modern scrollbar for all scrollable elements */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--card-border) transparent;
+}
+
+*::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: var(--card-border);
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background-color: var(--accent-color);
+}
+
+/* Hidden scrollbar for horizontal scroll areas (categories, etc.) */
+.categories-list,
+.ai-chat-messages,
+.ai-chat-messages textarea {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.categories-list::-webkit-scrollbar,
+.ai-chat-messages::-webkit-scrollbar,
+.ai-chat-messages textarea::-webkit-scrollbar {
+    display: none;
+}
+
+/* ========================= RESPONSIVE: SHARED COMPONENTS ========================= */
+@media (max-width: 1024px) {
+    .extram {
+        gap: 30px;
+    }
+
+    .detail-page-container {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .detail-sidebar {
+        position: static;
+        width: 100%;
+        margin-top: 50px;
+        top: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .sort-dropdown {
+        width: 100%;
+    }
+
+    #sort-button {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .extram {
+        gap: 20px;
+    }
+
+    .detail-main-content {
+        gap: 25px;
+    }
+}
+
+@media (max-width: 576px) {
+    .extram {
+        gap: 25px;
+    }
+
+    .detail-main-content {
+        gap: 20px;
+        width: 100% !important;
+    }
+
+    .comments-section {
+        margin-top: 30px;
+    }
+
+    .comment-form,
+    .comment-item {
+        padding: 15px;
+        gap: 12px;
+    }
+
+    .comment-avatar {
+        width: 36px;
+        height: 36px;
+    }
+
+    .comment-form .filled-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 10px;
+    }
+
+    .comment-header {
+        align-items: flex-start;
+    }
+
+    .comment-body p {
+        font-size: 15px;
+    }
+
+    .detail-sidebar {
+        margin-top: 40px;
+    }
+}

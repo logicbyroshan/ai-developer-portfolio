@@ -1,5 +1,4 @@
 from django.urls import path
-from django.contrib.auth.decorators import login_required
 from . import views
 
 app_name = "roshan"
@@ -16,8 +15,8 @@ urlpatterns = [
     ),
     # Playlists/Music
     path("playlist/", views.my_playlist, name="my_playlist"),
-    path("playlist/<str:playlist_id>/", views.playlist_detail, name="playlist_detail"),
-    # Manual Playlist Management
+    path("playlist/<int:playlist_id>/", views.playlist_detail, name="playlist_detail"),
+    # Playlist Management (admin only)
     path(
         "playlist/create/", views.create_manual_playlist, name="create_manual_playlist"
     ),
@@ -41,14 +40,6 @@ urlpatterns = [
         views.delete_manual_track,
         name="delete_manual_track",
     ),
-    # Admin Spotify management
-    path("admin/spotify/", views.admin_spotify_config, name="admin_spotify_config"),
-    path(
-        "admin/spotify/callback/",
-        views.admin_spotify_callback,
-        name="admin_spotify_callback",
-    ),
-    path("admin/spotify/sync/", views.sync_playlists, name="sync_playlists"),
     # Legal pages
     path("privacy/", views.PrivacyPolicyView.as_view(), name="privacy_policy"),
     path("terms/", views.TermsOfServiceView.as_view(), name="terms_of_service"),

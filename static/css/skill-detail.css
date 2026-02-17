@@ -22,33 +22,8 @@
 
 /* Override main container for skill detail pages to reduce excessive spacing */
 .skill-detail-page .main-container {
-    gap: 40px; /* Reduced from 150px for tighter spacing */
-}
-
-.detail-page-container {
-    width: 100%;
-    display: flex;
     gap: 40px;
-    align-items: flex-start;
-}
-
-.detail-main-content {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 35px;
-    overflow-wrap: break-word;
-}
-
-.detail-sidebar {
-    width: 320px;
-    flex-shrink: 0;
-    position: sticky;
-    top: 40px;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
+    /* Reduced from 150px for tighter spacing */
 }
 
 
@@ -90,7 +65,8 @@
 
 .skill-title {
     font-size: 48px;
-    margin: 0 0 15px 0; /* Inherits from base.css h1 */
+    margin: 0 0 15px 0;
+    /* Inherits from base.css h1 */
 }
 
 .skill-summary {
@@ -153,7 +129,8 @@
 
 .technologies-section h2 {
     font-size: 32px;
-    margin-bottom: 25px; /* Inherits from base.css h2 */
+    margin-bottom: 25px;
+    /* Inherits from base.css h2 */
 }
 
 .technology-grid {
@@ -219,7 +196,8 @@
 
 .learning-journey-section h2 {
     font-size: 32px;
-    margin-bottom: 25px; /* Inherits from base.css h2 */
+    margin-bottom: 25px;
+    /* Inherits from base.css h2 */
 }
 
 .learning-content {
@@ -363,29 +341,13 @@
     color: white;
 }
 
-.author-info {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.author-info img {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: 2px solid var(--card-border);
-}
-
+/* Skill-specific author-info overrides (base in shared.css) */
 .author-info h4 {
-    font-size: 18px;
-    color: var(--title-color);
     margin: 0 0 5px 0;
 }
 
 .author-info p {
-    font-size: 14px;
     margin: 0 0 10px 0;
-    color: var(--paragraph-color);
 }
 
 .author-links {
@@ -426,26 +388,12 @@
 
 /* Tablet & Large Mobile Landscape */
 @media (max-width: 1024px) {
-    .detail-page-container {
-        flex-direction: column;
-        gap: 30px;
-    }
-    
-    .detail-sidebar {
-        position: static;
-        width: 100%;
-        margin-top: 0;
-        top: 0;
-    }
-    
     .skill-header {
         flex-direction: column;
         text-align: center;
         gap: 20px;
     }
-    
-    /* .skill-title inherits from base.css responsive h1 styles */
-    
+
     .technology-grid {
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 15px;
@@ -458,48 +406,38 @@
     .skill-detail-page .main-container {
         gap: 30px;
     }
-    
-    .detail-page-container {
-        gap: 20px;
-    }
-    
-    .detail-main-content {
-        gap: 25px;
-    }
-    
-
 
     .skill-icon {
         width: 60px;
         height: 60px;
         font-size: 28px;
     }
-    
+
     .skill-title {
         line-height: 1.25;
     }
-    
+
     /* .skill-summary inherits from base.css paragraph styles */
-    
+
     .technologies-section h2,
     .learning-journey-section h2 {
         font-size: 24px;
     }
-    
+
     .technology-grid {
         grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
         gap: 10px;
     }
-    
+
     .technology-item {
         padding: 15px 10px;
     }
-    
+
     .learning-content {
         padding: 20px;
         font-size: 15px;
     }
-    
+
     .detail-sidebar {
         gap: 20px;
     }

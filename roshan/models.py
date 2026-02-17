@@ -1,22 +1,48 @@
 from django.db import models
 from django.utils.text import slugify
-from django.utils import timezone
 from tinymce.models import HTMLField
 from django.core.exceptions import ValidationError
-import bleach
+import nh3
 import os
 
-ALLOWED_TAGS = ["b", "i", "strong", "em", "u", "a", "br", "p", "ul", "ol", "li", "span"]
+ALLOWED_TAGS = {
+    "b", "i", "strong", "em", "u", "a", "br", "p", "ul", "ol", "li", "span",
+    "h1", "h2", "h3", "h4", "h5", "h6",
+    "table", "thead", "tbody", "tfoot", "tr", "th", "td", "caption", "colgroup", "col",
+    "div", "section", "article", "header", "footer", "nav", "aside",
+    "img", "figure", "figcaption", "picture", "source",
+    "blockquote", "pre", "code", "hr", "sub", "sup", "mark", "del", "ins", "abbr",
+    "dl", "dt", "dd", "details", "summary",
+    "iframe", "video", "audio",
+}
 ALLOWED_ATTRIBUTES = {
-    "a": ["href", "title", "target", "rel"],
-    "span": ["style"],
+    "a": {"href", "title", "target", "rel"},
+    "img": {"src", "alt", "title", "width", "height", "loading", "style"},
+    "iframe": {"src", "width", "height", "frameborder", "allow", "allowfullscreen", "title", "loading", "style"},
+    "video": {"src", "controls", "width", "height", "autoplay", "muted", "loop", "poster"},
+    "audio": {"src", "controls"},
+    "source": {"src", "type", "media"},
+    "td": {"colspan", "rowspan", "style"},
+    "th": {"colspan", "rowspan", "scope", "style"},
+    "col": {"span", "style"},
+    "colgroup": {"span"},
+    "span": {"style", "class"},
+    "div": {"style", "class"},
+    "p": {"style", "class"},
+    "pre": {"class"},
+    "code": {"class"},
+    "blockquote": {"cite"},
+    "abbr": {"title"},
+    "h1": {"style"}, "h2": {"style"}, "h3": {"style"}, "h4": {"style"}, "h5": {"style"}, "h6": {"style"},
+    "table": {"style", "class"},
+    "figure": {"class"},
 }
 
 
 def sanitize_html(value):
     if value:
-        return bleach.clean(
-            value, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES, strip=True
+        return nh3.clean(
+            value, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES
         )
     return value
 
@@ -208,7 +234,6 @@ class ResourceCategory(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=100, unique=True, editable=False)
     description = HTMLField(
-        max_length=200,
         blank=True,
         help_text="Brief description of this resource category with HTML support",
     )
@@ -226,7 +251,14 @@ class ResourceCategory(models.Model):
         ordering = ["order", "name"]
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
+        if not self.slug or self.slug != slugify(self.name):
+            base_slug = slugify(self.name)
+            slug = base_slug
+            counter = 1
+            while ResourceCategory.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
         self.description = sanitize_html(self.description)
         super().save(*args, **kwargs)
 
@@ -251,7 +283,7 @@ class Resource(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True, editable=False)
     description = HTMLField(
-        max_length=300, help_text="Brief description of the resource with HTML support"
+        help_text="Brief description of the resource with HTML support"
     )
     resource_type = models.CharField(
         max_length=3, choices=ResourceType.choices, default=ResourceType.ARTICLE
@@ -308,10 +340,10 @@ class Resource(models.Model):
         blank=True, null=True, help_text="When the resource was originally published"
     )
     is_featured = models.BooleanField(
-        default=False, help_text="Display this resource prominently"
+        default=False, db_index=True, help_text="Display this resource prominently"
     )
     is_active = models.BooleanField(
-        default=True, help_text="Whether this resource should be displayed"
+        default=True, db_index=True, help_text="Whether this resource should be displayed"
     )
     order = models.PositiveIntegerField(
         default=0, help_text="Display order within category"
@@ -332,7 +364,14 @@ class Resource(models.Model):
         verbose_name_plural = "Resources"
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.title)
+        if not self.slug or self.slug != slugify(self.title):
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
+            while Resource.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
         self.description = sanitize_html(self.description)
         super().save(*args, **kwargs)
 
@@ -391,84 +430,7 @@ class ResourceView(models.Model):
 
 
 # =========================================================================
-# SPOTIFY/MUSIC MODELS (from music app)
-# =========================================================================
-
-
-class SpotifyPlaylist(models.Model):
-    spotify_id = models.CharField(max_length=100, unique=True)
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
-    image_url = models.URLField(blank=True, null=True)
-    external_url = models.URLField()
-    owner_name = models.CharField(max_length=255)
-    track_count = models.IntegerField(default=0)
-    is_public = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    last_synced = models.DateTimeField(default=timezone.now)
-
-    class Meta:
-        ordering = ["-updated_at"]
-        verbose_name = "Spotify Playlist"
-        verbose_name_plural = "Spotify Playlists"
-
-    def __str__(self):
-        return self.name
-
-
-class SpotifyTrack(models.Model):
-    playlist = models.ForeignKey(
-        SpotifyPlaylist, related_name="tracks", on_delete=models.CASCADE
-    )
-    spotify_id = models.CharField(max_length=100)
-    name = models.CharField(max_length=255)
-    artist = models.CharField(max_length=255)
-    album = models.CharField(max_length=255, blank=True)
-    duration_ms = models.IntegerField(default=0)
-    preview_url = models.URLField(blank=True, null=True)
-    external_url = models.URLField()
-    track_number = models.IntegerField(default=0)
-
-    class Meta:
-        ordering = ["track_number"]
-        unique_together = ["playlist", "spotify_id"]
-        verbose_name = "Spotify Track"
-        verbose_name_plural = "Spotify Tracks"
-
-    def __str__(self):
-        return f"{self.name} by {self.artist}"
-
-    @property
-    def duration_formatted(self):
-        """Format duration from milliseconds to MM:SS"""
-        if not self.duration_ms:
-            return "0:00"
-
-        total_seconds = self.duration_ms // 1000
-        minutes = total_seconds // 60
-        seconds = total_seconds % 60
-        return f"{minutes}:{seconds:02d}"
-
-
-class SpotifyToken(models.Model):
-    """Store admin's Spotify tokens for periodic sync"""
-
-    access_token = models.TextField()
-    refresh_token = models.TextField()
-    expires_at = models.DateTimeField()
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        verbose_name = "Spotify Token"
-        verbose_name_plural = "Spotify Tokens"
-
-    def __str__(self):
-        return f"Spotify Token (expires: {self.expires_at})"
-
-
-# =========================================================================
-# MANUAL PLAYLIST MODELS
+# PLAYLIST MODELS
 # =========================================================================
 
 
@@ -485,8 +447,8 @@ class ManualPlaylist(models.Model):
         validators=[validate_image_file],
         help_text="Cover image for the playlist (supports all image formats)",
     )
-    is_public = models.BooleanField(default=True)
-    is_featured = models.BooleanField(default=False)
+    is_public = models.BooleanField(default=True, db_index=True)
+    is_featured = models.BooleanField(default=False, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -496,7 +458,14 @@ class ManualPlaylist(models.Model):
         verbose_name_plural = "Manual Playlists"
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
+        if not self.slug or self.slug != slugify(self.name):
+            base_slug = slugify(self.name)
+            slug = base_slug
+            counter = 1
+            while ManualPlaylist.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -543,14 +512,11 @@ class ManualTrack(models.Model):
     youtube_url = models.URLField(
         blank=True, null=True, help_text="YouTube URL for the track"
     )
-    spotify_url = models.URLField(
-        blank=True, null=True, help_text="Spotify URL for the track"
-    )
     apple_music_url = models.URLField(
         blank=True, null=True, help_text="Apple Music URL for the track"
     )
     track_number = models.PositiveIntegerField(default=0)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

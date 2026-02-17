@@ -4,15 +4,42 @@ from tinymce.models import HTMLField
 from portfolio.models import Category
 from roshan.models import AboutMeConfiguration
 from django.core.exceptions import ValidationError
-import bleach
+import nh3
 import math
 import re
 import os
 
-ALLOWED_TAGS = ["b", "i", "strong", "em", "u", "a", "br", "p", "ul", "ol", "li", "span"]
+ALLOWED_TAGS = {
+    "b", "i", "strong", "em", "u", "a", "br", "p", "ul", "ol", "li", "span",
+    "h1", "h2", "h3", "h4", "h5", "h6",
+    "table", "thead", "tbody", "tfoot", "tr", "th", "td", "caption", "colgroup", "col",
+    "div", "section", "article", "header", "footer", "nav", "aside",
+    "img", "figure", "figcaption", "picture", "source",
+    "blockquote", "pre", "code", "hr", "sub", "sup", "mark", "del", "ins", "abbr",
+    "dl", "dt", "dd", "details", "summary",
+    "iframe", "video", "audio",
+}
 ALLOWED_ATTRIBUTES = {
-    "a": ["href", "title", "target", "rel"],
-    "span": ["style"],
+    "a": {"href", "title", "target", "rel"},
+    "img": {"src", "alt", "title", "width", "height", "loading", "style"},
+    "iframe": {"src", "width", "height", "frameborder", "allow", "allowfullscreen", "title", "loading", "style"},
+    "video": {"src", "controls", "width", "height", "autoplay", "muted", "loop", "poster"},
+    "audio": {"src", "controls"},
+    "source": {"src", "type", "media"},
+    "td": {"colspan", "rowspan", "style"},
+    "th": {"colspan", "rowspan", "scope", "style"},
+    "col": {"span", "style"},
+    "colgroup": {"span"},
+    "span": {"style", "class"},
+    "div": {"style", "class"},
+    "p": {"style", "class"},
+    "pre": {"class"},
+    "code": {"class"},
+    "blockquote": {"cite"},
+    "abbr": {"title"},
+    "h1": {"style"}, "h2": {"style"}, "h3": {"style"}, "h4": {"style"}, "h5": {"style"}, "h6": {"style"},
+    "table": {"style", "class"},
+    "figure": {"class"},
 }
 
 
@@ -44,8 +71,8 @@ def validate_image_file(file):
 
 def sanitize_html(value):
     if value:
-        return bleach.clean(
-            value, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES, strip=True
+        return nh3.clean(
+            value, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES
         )
     return value
 
@@ -78,7 +105,14 @@ class Blog(models.Model):
         return minutes if minutes > 0 else 1
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.title)
+        if not self.slug or self.slug != slugify(self.title):
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
+            while Blog.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
         self.summary = sanitize_html(self.summary)
         self.content = sanitize_html(self.content)
         # Calculate reading time automatically
@@ -118,7 +152,7 @@ class Comment(models.Model):
     author_name = models.CharField(max_length=100)
     body = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True)
-    is_approved = models.BooleanField(default=True)
+    is_approved = models.BooleanField(default=True, db_index=True)
 
     class Meta:
         ordering = ["created_date"]

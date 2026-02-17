@@ -24,7 +24,8 @@ class ContactNotification(models.Model):
     status = models.CharField(
         max_length=20,
         choices=NotificationStatus.choices,
-        default=NotificationStatus.PENDING
+        default=NotificationStatus.PENDING,
+        db_index=True,
     )
     
     # Admin notification tracking
@@ -101,7 +102,7 @@ class EmailTemplate(models.Model):
     text_content = models.TextField(
         help_text="Plain text email content. Use {{variable}} for dynamic content."
     )
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

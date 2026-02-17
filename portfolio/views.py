@@ -1,16 +1,13 @@
 from django.http import JsonResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib import messages
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render, redirect
 from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView
-from django.db import models
-from django.db.models import Q
-from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from django.views.decorators.csrf import csrf_exempt
-import json
+from django.utils.decorators import method_decorator
+from django_ratelimit.decorators import ratelimit
 
 # Import all models from your models.py
 from .models import (
@@ -48,7 +45,6 @@ class HomeView(TemplateView):
         # =================================================================
         # NEW & UPDATED: Skill Categories for Skills Section
         # =================================================================
-        from django.db.models import Count
 
         # Get skill categories with counts and first few technologies
         skill_categories = []
@@ -143,7 +139,7 @@ class ProjectDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        project = self.get_object()
+        project = self.object  # Already fetched by DetailView
 
         # Get initial 5 comments for display
         initial_comments = project.comments.filter(is_approved=True).order_by(
@@ -168,16 +164,16 @@ class ProjectDetailView(DetailView):
         return context
 
     def post(self, request, *args, **kwargs):
+        project = self.get_object()
+
         # Check if user is authenticated
         if not request.user.is_authenticated:
-            project = self.get_object()
             login_url = (
                 reverse("authentication:login")
                 + f'?next={reverse("portfolio:project_detail", kwargs={"slug": project.slug})}%23comments'
             )
             return HttpResponseRedirect(login_url)
 
-        project = self.get_object()
         body = request.POST.get("body")
 
         redirect_url = (
@@ -187,6 +183,9 @@ class ProjectDetailView(DetailView):
         response = HttpResponseRedirect(redirect_url)
 
         if body:
+            if len(body) > 5000:
+                messages.error(request, "Comment is too long. Maximum 5000 characters.")
+                return response
             # Create comment with authenticated user's name
             author_name = request.user.first_name or request.user.username
             ProjectComment.objects.create(
@@ -206,12 +205,15 @@ def load_more_project_comments(request, slug):
     if request.method == "GET":
         project = get_object_or_404(Project, slug=slug)
         offset = int(request.GET.get("offset", 0))
+        offset = max(0, offset)  # Prevent negative offsets
+
+        total_comments = project.comments.filter(is_approved=True).count()
+        offset = min(offset, total_comments)  # Cap offset at total count
 
         # Load 10 comments starting from the offset
         comments = project.comments.filter(is_approved=True).order_by("-created_date")[
             offset : offset + 10
         ]
-        total_comments = project.comments.filter(is_approved=True).count()
 
         # Get user's liked comments if authenticated
         user_liked_comments = []
@@ -324,6 +326,7 @@ class SkillDetailView(DetailView):
 class ContactSubmissionView(View):
     """Handles the submission of the main contact form."""
 
+    @method_decorator(ratelimit(key="ip", rate="5/m", method="POST", block=True))
     def post(self, request, *args, **kwargs):
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
             form = ContactForm(request.POST)
@@ -365,6 +368,7 @@ class ContactSubmissionView(View):
 class NewsletterSubscribeHomeView(View):
     """Handles the submission of the newsletter form on the homepage."""
 
+    @method_decorator(ratelimit(key="ip", rate="5/m", method="POST", block=True))
     def post(self, request, *args, **kwargs):
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
             form = NewsletterForm(request.POST)

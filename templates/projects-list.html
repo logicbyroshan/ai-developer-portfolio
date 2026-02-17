@@ -72,122 +72,134 @@ Projects Portfolio - Full Stack & AI Applications by Roshan Damor
 {% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/projects.css' %}">
+<link rel="stylesheet" href="{% static 'css/projects.css' %}">
 {% endblock %}
 
 {% block extra_js %}
-    <script src="{% static 'js/projects.js' %}" defer></script>
+<script src="{% static 'js/projects.js' %}" defer></script>
 {% endblock %}
 
 
 {% block content %}
-    <div class="projects-container">
-        <!-- ======================= Page Header ======================= -->
-        <header class="portfolio-header" data-animation="fade-in-up">
-            <h1>Things I've <span>Built</span></h1>
-            <p>A collection of my work, from full-stack web applications to AI experiments. Each project represents a unique challenge and a learning opportunity.</p>
-        </header>
+<div class="projects-container">
+    <!-- ======================= Page Header ======================= -->
+    <header class="portfolio-header" data-animation="fade-in-up">
+        <h1>Things I've <span>Built</span></h1>
+        <p>A collection of my work, from full-stack web applications to AI experiments. Each project represents a unique
+            challenge and a learning opportunity.</p>
+    </header>
 
-        <!-- ======================= Project Toolbar ======================= -->
-        <div class="project-toolbar" data-animation="fade-in-up" data-animation-delay="200">
-            <div class="categories-scroller">
-                <button class="scroll-btn" id="scroll-left" aria-label="Scroll left"><i class="fa-solid fa-chevron-left"></i></button>
-                <div class="categories-list" id="categories-list">
-                    <!-- DYNAMIC: Category links with active state check -->
-                    <a href="{% url 'portfolio:project_list' %}" class="category-badge {% if not request.GET.category or request.GET.category == 'all' %}active{% endif %}">All</a>
-                    {% for category in categories %}
-                        <a href="?category={{ category.slug }}" class="category-badge {% if request.GET.category == category.slug %}active{% endif %}">{{ category.name }}</a>
-                    {% endfor %}
-                </div>
-                <button class="scroll-btn" id="scroll-right" aria-label="Scroll right"><i class="fa-solid fa-chevron-right"></i></button>
+    <!-- ======================= Project Toolbar ======================= -->
+    <div class="page-toolbar" data-animation="fade-in-up" data-animation-delay="200">
+        <div class="categories-scroller">
+            <button class="scroll-btn" id="scroll-left" aria-label="Scroll left"><i
+                    class="fa-solid fa-chevron-left"></i></button>
+            <div class="categories-list" id="categories-list">
+                <!-- DYNAMIC: Category links with active state check -->
+                <a href="{% url 'portfolio:project_list' %}"
+                    class="category-badge {% if not request.GET.category or request.GET.category == 'all' %}active{% endif %}">All</a>
+                {% for category in categories %}
+                <a href="?category={{ category.slug }}"
+                    class="category-badge {% if request.GET.category == category.slug %}active{% endif %}">{{
+                    category.name }}</a>
+                {% endfor %}
             </div>
-            <div class="sort-dropdown">
-                <button id="sort-button">Sort By <i class="fa-solid fa-caret-down"></i></button>
-                <ul id="sort-items">
-                    <!-- DYNAMIC: Sorting links that preserve category filter -->
-                    <li><a href="?sort=newest{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">Newest First</a></li>
-                    <li><a href="?sort=oldest{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">Oldest First</a></li>
-                </ul>
+            <button class="scroll-btn" id="scroll-right" aria-label="Scroll right"><i
+                    class="fa-solid fa-chevron-right"></i></button>
+        </div>
+        <div class="sort-dropdown">
+            <button id="sort-button">Sort By <i class="fa-solid fa-caret-down"></i></button>
+            <ul id="sort-items">
+                <!-- DYNAMIC: Sorting links that preserve category filter -->
+                <li><a href="?sort=newest{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">Newest
+                        First</a></li>
+                <li><a href="?sort=oldest{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">Oldest
+                        First</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ======================= Project Grid ======================= -->
+    <div class="project-grid" id="project-card-container">
+        {% for project in projects %}
+        <div class="project-card card clickable-card" data-animation="zoom-in"
+            data-url="{% url 'portfolio:project_detail' slug=project.slug %}">
+            <div class="project-media">
+                {% if project.youtube_embed_url %}
+                <div class="youtube-video-container">
+                    <iframe src="{{ project.youtube_embed_url }}" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen loading="lazy" title="{{ project.title }} - YouTube Video">
+                    </iframe>
+                </div>
+                {% elif project.cover_image %}
+                <img src="{{ project.cover_image.url }}" alt="{{ project.title }}" class="project-image">
+                {% else %}
+                <img src="https://placehold.co/1920x1080/010409/eaeaea?text={{ project.title|urlencode }}"
+                    alt="{{ project.title }}" class="project-image placeholder">
+                {% endif %}
+            </div>
+            <div class="project-content">
+                <h3>{{ project.title }}</h3>
+                <div class="skills">
+                    {% for tech in project.technologies.all|slice:":5" %}
+                    <span class="teg">{{ tech.name }}</span>
+                    {% endfor %}
+                    {% if project.technologies.count > 5 %}
+                    <span class="teg more-tech">+{{ project.technologies.count|add:"-5" }} more</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="project-links">
+                {% if project.github_url %}
+                <a href="{{ project.github_url }}" class="outline-btn" target="_blank" rel="noopener noreferrer"
+                    onclick="event.stopPropagation();"><i class="fa-brands fa-github"></i>Github</a>
+                {% endif %}
+                {% if project.live_url %}
+                <a href="{{ project.live_url }}" class="outline-btn" target="_blank" rel="noopener noreferrer"
+                    onclick="event.stopPropagation();"><i class="fa-solid fa-arrow-up-right-from-square"></i>Live
+                    Preview</a>
+                {% endif %}
             </div>
         </div>
-        
-        <!-- ======================= Project Grid ======================= -->
-        <div class="project-grid" id="project-card-container">
-            {% for project in projects %}
-            <div class="project-card card clickable-card" data-animation="zoom-in" data-url="{% url 'portfolio:project_detail' slug=project.slug %}">
-                <div class="project-media">
-                    {% if project.youtube_video_id %}
-                        <div class="youtube-video-container">
-                            <iframe 
-                                src="https://www.youtube.com/embed/{{ project.youtube_video_id }}?rel=0&modestbranding=1&showinfo=0" 
-                                frameborder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                allowfullscreen
-                                loading="lazy"
-                                title="{{ project.title }} - YouTube Video">
-                            </iframe>
-                        </div>
-                    {% elif project.cover_image %}
-                        <img src="{{ project.cover_image.url }}" alt="{{ project.title }}" class="project-image">
-                    {% else %}
-                        <img src="https://placehold.co/1920x1080/010409/eaeaea?text={{ project.title|urlencode }}" alt="{{ project.title }}" class="project-image placeholder">
-                    {% endif %}
-                </div>
-                <div class="project-content">
-                    <h3>{{ project.title }}</h3>
-                    <div class="skills">
-                        {% for tech in project.technologies.all|slice:":5" %}
-                        <span class="teg">{{ tech.name }}</span>
-                        {% endfor %}
-                        {% if project.technologies.count > 5 %}
-                        <span class="teg more-tech">+{{ project.technologies.count|add:"-5" }} more</span>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="project-links">
-                    {% if project.github_url %}
-                        <a href="{{ project.github_url }}" class="outline-btn" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();"><i class="fa-brands fa-github"></i>Github</a>
-                    {% endif %}
-                    {% if project.live_url %}
-                        <a href="{{ project.live_url }}" class="outline-btn" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();"><i class="fa-solid fa-arrow-up-right-from-square"></i>Live Preview</a>
-                    {% endif %}
-                </div>
-            </div>
+        {% endfor %}
+    </div>
+
+    <!-- ======================= Pagination ======================= -->
+    {% if is_paginated %}
+    <nav class="pagination" aria-label="Project pages">
+        <!-- DYNAMIC: Previous page link -->
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+            class="pagination-btn" aria-label="Previous Page">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        {% else %}
+        <button class="pagination-btn" disabled><i class="fa-solid fa-arrow-left"></i></button>
+        {% endif %}
+
+        <!-- DYNAMIC: Page number links -->
+        <div class="page-numbers">
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <a href="#" class="page-number active">{{ num }}</a>
+            {% else %}
+            <a href="?page={{ num }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+                class="page-number">{{ num }}</a>
+            {% endif %}
             {% endfor %}
         </div>
 
-        <!-- ======================= Pagination ======================= -->
-        {% if is_paginated %}
-        <nav class="pagination" aria-label="Project pages">
-            <!-- DYNAMIC: Previous page link -->
-            {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="pagination-btn" aria-label="Previous Page">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </a>
-            {% else %}
-                <button class="pagination-btn" disabled><i class="fa-solid fa-arrow-left"></i></button>
-            {% endif %}
-            
-            <!-- DYNAMIC: Page number links -->
-            <div class="page-numbers">
-                {% for num in page_obj.paginator.page_range %}
-                    {% if page_obj.number == num %}
-                        <a href="#" class="page-number active">{{ num }}</a>
-                    {% else %}
-                        <a href="?page={{ num }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="page-number">{{ num }}</a>
-                    {% endif %}
-                {% endfor %}
-            </div>
-
-            <!-- DYNAMIC: Next page link -->
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="pagination-btn" aria-label="Next Page">
-                    <i class="fa-solid fa-arrow-right"></i>
-                </a>
-            {% else %}
-                <button class="pagination-btn" disabled><i class="fa-solid fa-arrow-right"></i></button>
-            {% endif %}
-        </nav>
+        <!-- DYNAMIC: Next page link -->
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+            class="pagination-btn" aria-label="Next Page">
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
+        {% else %}
+        <button class="pagination-btn" disabled><i class="fa-solid fa-arrow-right"></i></button>
         {% endif %}
-    </div>
+    </nav>
+    {% endif %}
+</div>
 {% endblock %}

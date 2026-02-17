@@ -210,12 +210,12 @@ class ProjectAdmin(BaseModelAdmin):
     fieldsets = (
         (
             "📝 Basic Information",
-            {"fields": ("title", "slug", "summary"), "classes": ("wide",)},
+            {"fields": ("title", "slug", "summary", "content"), "classes": ("wide",)},
         ),
         (
             "🖼️ Media",
             {
-                "fields": ("cover_image", "cover_preview", "youtube_url"),
+                "fields": ("cover_image", "cover_preview", "youtube_embed_code"),
                 "classes": ("wide",),
             },
         ),
@@ -270,8 +270,8 @@ class ProjectAdmin(BaseModelAdmin):
     def has_youtube(self, obj):
         return format_html(
             '<span style="color: {};">{}</span>',
-            "#28a745" if obj.youtube_url else "#dc3545",
-            "✓" if obj.youtube_url else "✗",
+            "#28a745" if obj.youtube_embed_code else "#dc3545",
+            "✓" if obj.youtube_embed_code else "✗",
         )
 
     has_youtube.short_description = "Video"
@@ -333,7 +333,7 @@ class SkillAdmin(BaseModelAdmin):
     search_fields = ("title", "learning_journey")
     filter_horizontal = ("technologies",)
     list_editable = ("order", "is_featured")
-    prepopulated_fields = {"slug": ("title",)}
+    readonly_fields = ("slug",)
 
     def category_badge(self, obj):
         colors = {

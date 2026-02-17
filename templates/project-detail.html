@@ -80,178 +80,191 @@
 {% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/project-dtl.css' %}">
+<link rel="stylesheet" href="{% static 'css/project-dtl.css' %}">
 {% endblock %}
 
 {% block extra_js %}
-    <script src="{% static 'js/project-dtl.js' %}" defer></script>
+<script src="{% static 'js/project-dtl.js' %}" defer></script>
 {% endblock %}
 
 
 {% block content %}
 
-    <!-- ======================= Breadcrumb Navigation ======================= -->
-    <nav class="breadcrumb" aria-label="Breadcrumb" data-animation="fade-in-up">
-        <ul>
-            <li><a href="{% url 'portfolio:home' %}">Home</a></li>
-            <li><a href="{% url 'portfolio:project_list' %}">Projects</a></li>
-            <li class="active" aria-current="page">{{ project.title|truncatechars:30 }}</li>
-        </ul>
-    </nav>
+<!-- ======================= Breadcrumb Navigation ======================= -->
+<nav class="breadcrumb" aria-label="Breadcrumb" data-animation="fade-in-up">
+    <ul>
+        <li><a href="{% url 'portfolio:home' %}">Home</a></li>
+        <li><a href="{% url 'portfolio:project_list' %}">Projects</a></li>
+        <li class="active" aria-current="page">{{ project.title|truncatechars:30 }}</li>
+    </ul>
+</nav>
 
-    <div class="detail-page-container">
-        <!-- ======================= Main Content Column ======================= -->
-        <article class="detail-main-content">
-            <header class="detail-page-header" data-animation="fade-in-up" data-animation-delay="100">
-                <!-- DYNAMIC: Loop through project categories -->
-                {% for category in project.categories.all %}
-                    <span class="teg">{{ category.name }}</span>
+<div class="detail-page-container">
+    <!-- ======================= Main Content Column ======================= -->
+    <article class="detail-main-content">
+        <header class="detail-page-header" data-animation="fade-in-up" data-animation-delay="100">
+            <!-- DYNAMIC: Loop through project categories -->
+            {% for category in project.categories.all %}
+            <span class="teg">{{ category.name }}</span>
+            {% endfor %}
+            <span class="teg"><i class="fa-regular fa-calendar-check"></i>{{ project.created_date|date:"M d, Y"
+                }}</span>
+        </header>
+
+        <h1 class="project-title" data-animation="fade-in-up" data-animation-delay="200">{{ project.title }}</h1>
+        <p class="project-description" data-animation="fade-in-up" data-animation-delay="300">{{ project.summary|safe }}
+        </p>
+
+        <!-- Image Slider -->
+        <div class="hero-image-slider" id="project-slider" data-animation="zoom-in" data-animation-delay="400">
+            <div class="slider-wrapper">
+                {% if project.youtube_embed_url %}
+                <!-- YouTube Video Slide -->
+                <div class="slide video-slide">
+                    <div class="youtube-video-container">
+                        <iframe src="{{ project.youtube_embed_url }}" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen title="{{ project.title }} - YouTube Video">
+                        </iframe>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- DYNAMIC: Loop through related project images -->
+                {% for p_image in project.images.all %}
+                <div class="slide"><img src="{{ p_image.image.url }}" alt="{{ p_image.caption|default:project.title }}">
+                </div>
+                {% empty %}
+                {% if not project.youtube_embed_url %}
+                <!-- Fallback if no slider images are uploaded and no YouTube video -->
+                <div class="slide"><img
+                        src="{% if project.cover_image %}{{ project.cover_image.url }}{% else %}https://placehold.co/1920x1080/010409/eaeaea?text={{ project.title|urlencode }}{% endif %}"
+                        alt="{{ project.title }}"></div>
+                {% endif %}
                 {% endfor %}
-                <span class="teg"><i class="fa-regular fa-calendar-check"></i>{{ project.created_date|date:"M d, Y" }}</span>
-            </header>
+            </div>
+            {% with total_slides=project.images.all|length %}
+            {% if project.youtube_embed_url and total_slides > 0 or total_slides > 1 %}
+            <div class="image-counter">
+                <span id="current-slide">1</span> / <span id="total-slides">{% if project.youtube_embed_url %}{{
+                    total_slides|add:1 }}{% else %}{{ total_slides }}{% endif %}</span>
+            </div>
+            <button class="slider-btn prev" id="prev-slide" aria-label="Previous Slide"><i
+                    class="fa-solid fa-chevron-left"></i></button>
+            <button class="slider-btn next" id="next-slide" aria-label="Next Slide"><i
+                    class="fa-solid fa-chevron-right"></i></button>
+            {% endif %}
+            {% endwith %}
+        </div>
 
-            <h1 class="project-title" data-animation="fade-in-up" data-animation-delay="200">{{ project.title }}</h1>
-            <p class="project-description" data-animation="fade-in-up" data-animation-delay="300">{{ project.summary|safe }}</p>
-            
-            <!-- Image Slider -->
-            <div class="hero-image-slider" id="project-slider" data-animation="zoom-in" data-animation-delay="400">
-                <div class="slider-wrapper">
-                    {% if project.youtube_video_id %}
-                    <!-- YouTube Video Slide -->
-                    <div class="slide video-slide">
-                        <div class="youtube-video-container">
-                            <iframe 
-                                src="https://www.youtube.com/embed/{{ project.youtube_video_id }}?autoplay=1&rel=0&modestbranding=1&showinfo=0" 
-                                frameborder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                allowfullscreen
-                                title="{{ project.title }} - YouTube Video">
-                            </iframe>
+        <!-- DYNAMIC: Main Content Body from TinyMCE, marked as 'safe' to render HTML -->
+        <div class="project-content-body" data-animation="fade-in-up">
+            {{ project.content|safe }}
+        </div>
+
+        <!-- ======================= Comments Section ======================= -->
+        <section class="comments-section" id="comments">
+            <!-- DYNAMIC: Comment count -->
+            <h2 data-animation="fade-in-up">Comments ({{ comments.count }})</h2>
+
+            <!-- Comment Form -->
+            {% if user.is_authenticated %}
+            <form class="comment-form card" id="comment-form" method="post"
+                action="{% url 'portfolio:project_detail' slug=project.slug %}" data-animation="fade-in-up">
+                {% csrf_token %}
+                <div class="form-content">
+                    <textarea name="body" placeholder="Share your thoughts about this project..." rows="3"
+                        required></textarea>
+                    <button type="submit" class="filled-btn">Post Comment</button>
+                </div>
+            </form>
+            {% else %}
+            <div class="comment-auth-prompt card" data-animation="fade-in-up">
+                <div class="auth-prompt-content">
+                    <p>Sign in to join the conversation and share your thoughts about this project.</p>
+                    <div class="auth-buttons">
+                        <a href="{% url 'authentication:login' %}?next={% url 'portfolio:project_detail' slug=project.slug %}%23comments"
+                            class="filled-btn">Sign In</a>
+                        <a href="{% url 'authentication:signup' %}?next={% url 'portfolio:project_detail' slug=project.slug %}%23comments"
+                            class="outline-btn">Create Account</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- List of Comments -->
+            <div class="comment-list" id="comment-list">
+                <!-- DYNAMIC: Loop through comments from the view -->
+                {% for comment in comments %}
+                <div class="comment-item">
+                    <div class="comment-header">
+                        <div class="comment-avatar" data-avatar-color="{{ comment.author_name|avatar_color }}">
+                            {{ comment.author_name|initials }}
+                        </div>
+                        <div class="comment-meta">
+                            <h4 class="comment-author">{{ comment.author_name }}</h4>
+                            <span class="comment-date">{{ comment.created_date|date:"F d, Y \a\t g:i A" }}</span>
                         </div>
                     </div>
-                    {% endif %}
-                    
-                    <!-- DYNAMIC: Loop through related project images -->
-                    {% for p_image in project.images.all %}
-                    <div class="slide"><img src="{{ p_image.image.url }}" alt="{{ p_image.caption|default:project.title }}"></div>
-                    {% empty %}
-                    {% if not project.youtube_video_id %}
-                    <!-- Fallback if no slider images are uploaded and no YouTube video -->
-                    <div class="slide"><img src="{% if project.cover_image %}{{ project.cover_image.url }}{% else %}https://placehold.co/1920x1080/010409/eaeaea?text={{ project.title|urlencode }}{% endif %}" alt="{{ project.title }}"></div>
-                    {% endif %}
-                    {% endfor %}
+                    <div class="comment-body">
+                        <p>{{ comment.body|safe }}</p>
+                    </div>
+                    <div class="comment-actions">
+                        <button class="like-btn{% if comment.id in user_liked_comments %} active{% endif %}"
+                            data-comment-id="{{ comment.id }}">
+                            <i
+                                class="fa-{% if comment.id in user_liked_comments %}solid{% else %}regular{% endif %} fa-heart"></i>
+                            <span class="like-count">{{ comment.total_likes }}</span>
+                        </button>
+                    </div>
                 </div>
-                {% with total_slides=project.images.all|length %}
-                {% if project.youtube_video_id and total_slides > 0 or total_slides > 1 %}
-                <div class="image-counter">
-                    <span id="current-slide">1</span> / <span id="total-slides">{% if project.youtube_video_id %}{{ total_slides|add:1 }}{% else %}{{ total_slides }}{% endif %}</span>
-                </div>
-                <button class="slider-btn prev" id="prev-slide" aria-label="Previous Slide"><i class="fa-solid fa-chevron-left"></i></button>
-                <button class="slider-btn next" id="next-slide" aria-label="Next Slide"><i class="fa-solid fa-chevron-right"></i></button>
+                {% empty %}
+                <p>Be the first to leave a comment about this project!</p>
+                {% endfor %}
+            </div>
+
+            <!-- Load More Button (controlled by JS) -->
+            {% if has_more_comments %}
+            <button class="outline-btn" id="load-more-comments">Load More Comments</button>
+            {% endif %}
+        </section>
+    </article>
+
+    <!-- ======================= Sidebar ======================= -->
+    <aside class="detail-sidebar" data-animation="fade-in-up" data-animation-delay="500">
+        <div class="sidebar-card card">
+            <h3>Project Info</h3>
+            <div class="project-info-list">
+                <!-- DYNAMIC: Buttons only show if URLs exist -->
+                {% if project.github_url %}
+                <a href="{{ project.github_url }}" class="filled-btn" target="_blank" rel="noopener noreferrer"><i
+                        class="fab fa-github"></i> View Source Code</a>
                 {% endif %}
-                {% endwith %}
-            </div>
-            
-            <!-- DYNAMIC: Main Content Body from TinyMCE, marked as 'safe' to render HTML -->
-            <div class="project-content-body" data-animation="fade-in-up">
-                {{ project.content|safe }}
-            </div>
-
-            <!-- ======================= Comments Section ======================= -->
-            <section class="comments-section" id="comments">
-                <!-- DYNAMIC: Comment count -->
-                <h2 data-animation="fade-in-up">Comments ({{ comments.count }})</h2>
-                
-                <!-- Comment Form -->
-                {% if user.is_authenticated %}
-                    <form class="comment-form card" id="comment-form" method="post" action="{% url 'portfolio:project_detail' slug=project.slug %}" data-animation="fade-in-up">
-                        {% csrf_token %}
-                        <div class="form-content">
-                            <textarea name="body" placeholder="Share your thoughts about this project..." rows="3" required></textarea>
-                            <button type="submit" class="filled-btn">Post Comment</button>
-                        </div>
-                    </form>
-                {% else %}
-                    <div class="comment-auth-prompt card" data-animation="fade-in-up">
-                        <div class="auth-prompt-content">
-                            <p>Sign in to join the conversation and share your thoughts about this project.</p>
-                            <div class="auth-buttons">
-                                <a href="{% url 'authentication:login' %}?next={% url 'portfolio:project_detail' slug=project.slug %}%23comments" class="filled-btn">Sign In</a>
-                                <a href="{% url 'authentication:signup' %}?next={% url 'portfolio:project_detail' slug=project.slug %}%23comments" class="outline-btn">Create Account</a>
-                            </div>
-                        </div>
-                    </div>
+                {% if project.live_url %}
+                <a href="{{ project.live_url }}" class="outline-btn" target="_blank" rel="noopener noreferrer"><i
+                        class="fas fa-external-link-alt"></i> View Live Site</a>
                 {% endif %}
-
-                <!-- List of Comments -->
-                <div class="comment-list" id="comment-list">
-                    <!-- DYNAMIC: Loop through comments from the view -->
-                    {% for comment in comments %}
-                    <div class="comment-item">
-                        <div class="comment-header">
-                            <div class="comment-avatar" data-avatar-color="{{ comment.author_name|avatar_color }}">
-                                {{ comment.author_name|initials }}
-                            </div>
-                            <div class="comment-meta">
-                                <h4 class="comment-author">{{ comment.author_name }}</h4>
-                                <span class="comment-date">{{ comment.created_date|date:"F d, Y \a\t g:i A" }}</span>
-                            </div>
-                        </div>
-                        <div class="comment-body">
-                            <p>{{ comment.body|safe }}</p>
-                        </div>
-                        <div class="comment-actions">
-                            <button class="like-btn{% if comment.id in user_liked_comments %} active{% endif %}" data-comment-id="{{ comment.id }}">
-                                <i class="fa-{% if comment.id in user_liked_comments %}solid{% else %}regular{% endif %} fa-heart"></i>
-                                <span class="like-count">{{ comment.total_likes }}</span>
-                            </button>
-                        </div>
-                    </div>
-                    {% empty %}
-                        <p>Be the first to leave a comment about this project!</p>
-                    {% endfor %}
-                </div>
-                
-                <!-- Load More Button (controlled by JS) -->
-                {% if has_more_comments %}
-                    <button class="outline-btn" id="load-more-comments">Load More Comments</button>
-                {% endif %}
-            </section>
-        </article>
-
-        <!-- ======================= Sidebar ======================= -->
-        <aside class="detail-sidebar" data-animation="fade-in-up" data-animation-delay="500">
-            <div class="sidebar-card card">
-                <h3>Project Info</h3>
-                <div class="project-info-list">
-                    <!-- DYNAMIC: Buttons only show if URLs exist -->
-                    {% if project.github_url %}
-                    <a href="{{ project.github_url }}" class="filled-btn" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> View Source Code</a>
-                    {% endif %}
-                    {% if project.live_url %}
-                    <a href="{{ project.live_url }}" class="outline-btn" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt"></i> View Live Site</a>
-                    {% endif %}
+            </div>
+        </div>
+        <div class="sidebar-card card">
+            <h3>Tech Stack</h3>
+            <div class="project-skills-list">
+                <!-- DYNAMIC: Loop through technologies for this project -->
+                {% for tech in project.technologies.all %}
+                <span class="teg">{{ tech.name }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="sidebar-card card">
+            <h3>Author</h3>
+            <div class="author-info">
+                <img src="{% static 'images/author-avatar.png' %}" alt="Roshan Damor">
+                <div>
+                    <h4>Roshan Damor</h4>
+                    <p>Full-Stack Developer</p>
                 </div>
             </div>
-            <div class="sidebar-card card">
-                <h3>Tech Stack</h3>
-                <div class="project-skills-list">
-                    <!-- DYNAMIC: Loop through technologies for this project -->
-                    {% for tech in project.technologies.all %}
-                    <span class="teg">{{ tech.name }}</span>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="sidebar-card card">
-                <h3>Author</h3>
-                <div class="author-info">
-                    <img src="{% static 'images/author-avatar.png' %}" alt="Roshan Damor">
-                    <div>
-                        <h4>Roshan Damor</h4>
-                        <p>Full-Stack Developer</p>
-                    </div>
-                </div>
-            </div>
-        </aside>
-    </div>
+        </div>
+    </aside>
+</div>
 {% endblock %}

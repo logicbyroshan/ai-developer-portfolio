@@ -1,21 +1,48 @@
 from django.db import models
 from django.utils.text import slugify
 from tinymce.models import HTMLField
-import bleach
+import nh3
 from django.core.exceptions import ValidationError
 import os
 
-ALLOWED_TAGS = ["b", "i", "strong", "em", "u", "a", "br", "p", "ul", "ol", "li", "span"]
+ALLOWED_TAGS = {
+    "b", "i", "strong", "em", "u", "a", "br", "p", "ul", "ol", "li", "span",
+    "h1", "h2", "h3", "h4", "h5", "h6",
+    "table", "thead", "tbody", "tfoot", "tr", "th", "td", "caption", "colgroup", "col",
+    "div", "section", "article", "header", "footer", "nav", "aside",
+    "img", "figure", "figcaption", "picture", "source",
+    "blockquote", "pre", "code", "hr", "sub", "sup", "mark", "del", "ins", "abbr",
+    "dl", "dt", "dd", "details", "summary",
+    "iframe", "video", "audio",
+}
 ALLOWED_ATTRIBUTES = {
-    "a": ["href", "title", "target", "rel"],
-    "span": ["style"],
+    "a": {"href", "title", "target", "rel"},
+    "img": {"src", "alt", "title", "width", "height", "loading", "style"},
+    "iframe": {"src", "width", "height", "frameborder", "allow", "allowfullscreen", "title", "loading", "style"},
+    "video": {"src", "controls", "width", "height", "autoplay", "muted", "loop", "poster"},
+    "audio": {"src", "controls"},
+    "source": {"src", "type", "media"},
+    "td": {"colspan", "rowspan", "style"},
+    "th": {"colspan", "rowspan", "scope", "style"},
+    "col": {"span", "style"},
+    "colgroup": {"span"},
+    "span": {"style", "class"},
+    "div": {"style", "class"},
+    "p": {"style", "class"},
+    "pre": {"class"},
+    "code": {"class"},
+    "blockquote": {"cite"},
+    "abbr": {"title"},
+    "h1": {"style"}, "h2": {"style"}, "h3": {"style"}, "h4": {"style"}, "h5": {"style"}, "h6": {"style"},
+    "table": {"style", "class"},
+    "figure": {"class"},
 }
 
 
 def sanitize_html(value):
     if value:
-        return bleach.clean(
-            value, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES, strip=True
+        return nh3.clean(
+            value, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES
         )
     return value
 
@@ -87,6 +114,18 @@ class SiteConfiguration(models.Model):
     class Meta:
         verbose_name = "Site Configuration"
 
+    def save(self, *args, **kwargs):
+        """Enforce singleton: only one SiteConfiguration can exist."""
+        if not self.pk and SiteConfiguration.objects.exists():
+            raise ValidationError("Only one Site Configuration instance is allowed.")
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def get_instance(cls):
+        """Get the singleton instance, creating one if needed."""
+        instance, _ = cls.objects.get_or_create(pk=1)
+        return instance
+
     def __str__(self):
         return "Site Configuration"
 
@@ -108,7 +147,7 @@ class Technology(models.Model):
     category = models.ForeignKey(
         "Category",
         limit_choices_to={"category_type": "SKL"},
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )
@@ -131,7 +170,7 @@ class Category(models.Model):
         OTHER = "OTH", "Other"
 
     name = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=100, editable=False)
+    slug = models.SlugField(max_length=100, unique=True, editable=False)
     category_type = models.CharField(max_length=3, choices=CategoryType.choices)
 
     class Meta:
@@ -143,7 +182,14 @@ class Category(models.Model):
         )  # Prevents "Web Dev" for both Blog and Project
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
+        if not self.slug or self.slug != slugify(self.name):
+            base_slug = slugify(self.name)
+            slug = base_slug
+            counter = 1
+            while Category.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -165,8 +211,13 @@ class Project(models.Model):
         blank=True,
         null=True,
     )
-    youtube_url = models.URLField(
-        blank=True, null=True, help_text="YouTube video URL for project demonstration"
+    youtube_embed_code = models.TextField(
+        blank=True,
+        default="",
+        help_text=(
+            "Paste the full YouTube iframe embed code or a plain YouTube URL. "
+            "Example: <iframe src=\"https://www.youtube.com/embed/VIDEO_ID\" ...></iframe>"
+        ),
     )
     technologies = models.ManyToManyField(Technology, related_name="projects")
     categories = models.ManyToManyField(
@@ -199,21 +250,41 @@ class Project(models.Model):
         return self.title
 
     @property
-    def youtube_video_id(self):
-        """Extract YouTube video ID from the URL"""
-        if not self.youtube_url:
+    def youtube_embed_url(self):
+        """Extract the embed src URL from iframe code or plain YouTube URL."""
+        if not self.youtube_embed_code:
             return None
-
         import re
+        # Try extracting src from iframe tag first
+        src_match = re.search(r'src=["\']([^"\']*)["\'\s]', self.youtube_embed_code)
+        if src_match:
+            return src_match.group(1)
+        # Fallback: extract video ID from a plain URL
+        vid_match = re.search(
+            r'(?:youtube\.com/watch\?v=|youtu\.be/|youtube\.com/embed/)([A-Za-z0-9_-]{11})',
+            self.youtube_embed_code,
+        )
+        if vid_match:
+            return f'https://www.youtube.com/embed/{vid_match.group(1)}?rel=0&modestbranding=1'
+        return None
 
-        # Handle different YouTube URL formats
+    @property
+    def has_youtube_embed(self):
+        """Check if this project has a YouTube embed."""
+        return bool(self.youtube_embed_url)
+
+    @property
+    def youtube_video_id(self):
+        """Extract YouTube video ID for thumbnail generation."""
+        if not self.youtube_embed_code:
+            return None
+        import re
         patterns = [
-            r"(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)",
-            r"youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]+)",
+            r'(?:youtube\.com/embed/)([A-Za-z0-9_-]{11})',
+            r'(?:youtube\.com/watch\?v=|youtu\.be/)([A-Za-z0-9_-]{11})',
         ]
-
         for pattern in patterns:
-            match = re.search(pattern, self.youtube_url)
+            match = re.search(pattern, self.youtube_embed_code)
             if match:
                 return match.group(1)
         return None
@@ -248,7 +319,7 @@ class ProjectComment(models.Model):
     body = models.TextField()
     # likes = models.PositiveIntegerField(default=0) # Removed, `total_likes` property handles this
     created_date = models.DateTimeField(auto_now_add=True)
-    is_approved = models.BooleanField(default=True)
+    is_approved = models.BooleanField(default=True, db_index=True)
 
     class Meta:
         ordering = ["created_date"]
@@ -285,7 +356,7 @@ class Experience(models.Model):
     experience_type = models.ForeignKey(
         Category,
         limit_choices_to={"category_type": Category.CategoryType.EXPERIENCE},
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
     )
 
     class Meta:
@@ -330,9 +401,30 @@ class Resume(models.Model):
 class VideoResume(models.Model):
     """Model for the Video Resume modal."""
 
-    youtube_embed_url = models.URLField(
-        help_text="The full YouTube embed URL (e.g., https://www.youtube.com/embed/VIDEO_ID)"
+    embed_code = models.TextField(
+        blank=True,
+        default="",
+        help_text=(
+            "Paste the full YouTube iframe embed code from YouTube's Share > Embed button, "
+            "or a plain YouTube URL. Example: <iframe src=\"https://www.youtube.com/embed/VIDEO_ID\" ...></iframe>"
+        )
     )
+
+    @property
+    def embed_url(self):
+        """Extract the embed src URL from iframe code or plain URL."""
+        import re
+        if not self.embed_code:
+            return ""
+        # Try extracting src from iframe tag
+        src_match = re.search(r'src=["\']([^"\']*)["\'\s]', self.embed_code)
+        if src_match:
+            return src_match.group(1)
+        # Fallback: treat as a plain URL and extract video ID
+        vid_match = re.search(r'(?:v=|/v/|embed/|youtu\.be/)([A-Za-z0-9_-]{11})', self.embed_code)
+        if vid_match:
+            return f'https://www.youtube.com/embed/{vid_match.group(1)}?rel=0&modestbranding=1'
+        return self.embed_code.strip()
 
     def __str__(self):
         return "Video Resume"
@@ -359,7 +451,7 @@ class ContactSubmission(models.Model):
         default=False, help_text="Mark as urgent for priority response"
     )
     submitted_date = models.DateTimeField(auto_now_add=True)
-    is_read = models.BooleanField(default=False)
+    is_read = models.BooleanField(default=False, db_index=True)
 
     class Meta:
         ordering = ["-submitted_date"]
@@ -409,7 +501,7 @@ class Skill(models.Model):
         default=1, help_text="Years of experience with this skill"
     )
     is_featured = models.BooleanField(
-        default=False, help_text="Display this skill prominently on the home page"
+        default=False, db_index=True, help_text="Display this skill prominently on the home page"
     )
 
     class Meta:
@@ -479,7 +571,7 @@ class Achievement(models.Model):
     category = models.ForeignKey(
         Category,
         limit_choices_to={"category_type": Category.CategoryType.ACHIEVEMENT},
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
     )
 
     class Meta:
@@ -491,10 +583,6 @@ class Achievement(models.Model):
 
     def __str__(self):
         return f"{self.title} from {self.issuing_organization}"
-        verbose_name_plural = "Testimonials"
-
-    def __str__(self):
-        return f"Testimonial by {self.author_name}"
 
 
 # =========================================================================

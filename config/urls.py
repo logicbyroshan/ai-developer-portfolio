@@ -4,7 +4,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.sitemaps.views import sitemap
 from django.views.generic import TemplateView, RedirectView
-from roshan.views import admin_spotify_callback
 from portfolio.sitemaps import (
     StaticViewSitemap,
     ProjectSitemap,
@@ -31,10 +30,7 @@ urlpatterns = [
     path("blogs/", include("blog.urls")),
     path("ai/", include("ai.urls")),
     path("auth/", include("authentication.urls")),
-    path("", include("roshan.urls")),  # Include roshan app URLs at root level
-    path(
-        "callback/", admin_spotify_callback, name="spotify_callback"
-    ),  # Admin callback for Spotify app config
+    path("", include("roshan.urls")),
     # SEO URLs
     path(
         "sitemap.xml",

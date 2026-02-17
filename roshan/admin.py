@@ -7,9 +7,6 @@ from .models import (
     ResourceCategory,
     Resource,
     ResourceView,
-    SpotifyPlaylist,
-    SpotifyTrack,
-    SpotifyToken,
     ManualPlaylist,
     ManualTrack,
 )
@@ -210,90 +207,7 @@ class ResourceViewAdmin(admin.ModelAdmin):
 
 
 # =========================================================================
-# MUSIC/SPOTIFY ADMIN INTERFACES
-# =========================================================================
-
-
-class SpotifyTrackInline(admin.TabularInline):
-    model = SpotifyTrack
-    extra = 0
-    readonly_fields = (
-        "spotify_id",
-        "name",
-        "artist",
-        "album",
-        "duration_ms",
-        "track_number",
-    )
-    can_delete = False
-
-
-@admin.register(SpotifyPlaylist)
-class SpotifyPlaylistAdmin(admin.ModelAdmin):
-    """Admin for Spotify playlists with inline tracks."""
-
-    inlines = [SpotifyTrackInline]
-    list_display = ("name", "owner_name", "track_count", "is_public", "last_synced")
-    list_filter = ("is_public", "owner_name", "last_synced")
-    search_fields = ("name", "description", "owner_name")
-    readonly_fields = (
-        "spotify_id",
-        "track_count",
-        "last_synced",
-        "created_at",
-        "updated_at",
-    )
-
-    fieldsets = (
-        ("Basic Information", {"fields": ("name", "description", "spotify_id")}),
-        ("Playlist Details", {"fields": ("owner_name", "track_count", "is_public")}),
-        ("Links & Media", {"fields": ("external_url", "image_url")}),
-        (
-            "Sync Information",
-            {
-                "fields": ("last_synced", "created_at", "updated_at"),
-                "classes": ("collapse",),
-            },
-        ),
-    )
-
-
-@admin.register(SpotifyTrack)
-class SpotifyTrackAdmin(admin.ModelAdmin):
-    """Admin for individual Spotify tracks."""
-
-    list_display = ("name", "artist", "album", "playlist", "track_number")
-    list_filter = ("playlist", "artist")
-    search_fields = ("name", "artist", "album")
-    readonly_fields = ("spotify_id",)
-    ordering = ("playlist", "track_number")
-
-    fieldsets = (
-        ("Track Information", {"fields": ("name", "artist", "album", "spotify_id")}),
-        ("Playlist Details", {"fields": ("playlist", "track_number")}),
-        ("Media & Links", {"fields": ("duration_ms", "preview_url", "external_url")}),
-    )
-
-
-@admin.register(SpotifyToken)
-class SpotifyTokenAdmin(admin.ModelAdmin):
-    """Admin for Spotify authentication tokens."""
-
-    list_display = ("expires_at", "created_at")
-    readonly_fields = ("created_at",)
-    ordering = ("-created_at",)
-
-    def has_add_permission(self, request):
-        """Only allow one token at a time."""
-        return not SpotifyToken.objects.exists()
-
-    def has_change_permission(self, request, obj=None):
-        """Tokens should generally be managed by the system."""
-        return False
-
-
-# =========================================================================
-# MANUAL PLAYLIST ADMIN
+# PLAYLIST ADMIN
 # =========================================================================
 
 
@@ -391,7 +305,7 @@ class ManualTrackAdmin(admin.ModelAdmin):
         ),
         (
             "External Links",
-            {"fields": ("spotify_url", "apple_music_url"), "classes": ("collapse",)},
+            {"fields": ("apple_music_url",), "classes": ("collapse",)},
         ),
         ("Settings", {"fields": ("is_active", "created_at")}),
     )

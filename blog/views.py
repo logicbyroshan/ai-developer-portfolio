@@ -53,7 +53,7 @@ class BlogDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        post = self.get_object()
+        post = self.object  # Already fetched by DetailView
         context["comments"] = post.comments.filter(is_approved=True)
 
         # Add user's liked comments for proper state management
@@ -75,16 +75,16 @@ class BlogDetailView(DetailView):
         return context
 
     def post(self, request, *args, **kwargs):
+        post = self.get_object()
+
         # Check if user is authenticated
         if not request.user.is_authenticated:
-            post = self.get_object()
             login_url = (
                 reverse("authentication:login")
                 + f'?next={reverse("blog:blog_detail", kwargs={"slug": post.slug})}%23comments'
             )
             return HttpResponseRedirect(login_url)
 
-        post = self.get_object()
         body = request.POST.get("body")
 
         redirect_url = (
@@ -93,6 +93,9 @@ class BlogDetailView(DetailView):
         response = HttpResponseRedirect(redirect_url)
 
         if body:
+            if len(body) > 5000:
+                messages.error(request, "Comment is too long. Maximum 5000 characters.")
+                return response
             # Create comment with authenticated user's name
             author_name = request.user.first_name or request.user.username
             Comment.objects.create(post=post, author_name=author_name, body=body)

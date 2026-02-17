@@ -1,7 +1,4 @@
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
 from django.conf import settings
-from django.utils import timezone
 from .models import NotificationSettings, EmailTemplate
 import logging
 
@@ -20,14 +17,10 @@ class EmailNotificationService:
         """
         Send notification email to admin about new contact submission
         """
-        print(f"   📧 send_admin_notification() called")
-        print(
-            f"      Admin notifications enabled: {self.settings.admin_notification_enabled}"
-        )
+        logger.debug("send_admin_notification() called, enabled=%s", self.settings.admin_notification_enabled)
 
         if not self.settings.admin_notification_enabled:
             logger.info("Admin notifications are disabled")
-            print(f"      ⚠️  Admin notifications are DISABLED in settings")
             return False
 
         try:
@@ -38,13 +31,13 @@ class EmailNotificationService:
                 subject = template.subject
                 html_content = template.html_content
                 text_content = template.text_content
-                print(f"      Using custom template: {template.name}")
+                logger.debug("Using custom template: %s", template.name)
             else:
                 # Default template
                 subject = f"New Contact Form Submission from {contact_submission.name}"
                 html_content = self._get_default_admin_html_template()
                 text_content = self._get_default_admin_text_template()
-                print(f"      Using default template")
+                logger.debug("Using default template")
 
             # Prepare template context
             context = {
@@ -62,9 +55,7 @@ class EmailNotificationService:
             rendered_text = self._render_template_string(text_content, context)
             rendered_subject = self._render_template_string(subject, context)
 
-            print(f"      From: {self.settings.from_email}")
-            print(f"      To: {self.settings.admin_email}")
-            print(f"      Subject: {rendered_subject}")
+            logger.debug("Sending admin email from=%s to=%s", self.settings.from_email, self.settings.admin_email)
 
             # Send email
             from django.core.mail import EmailMultiAlternatives
@@ -80,36 +71,27 @@ class EmailNotificationService:
 
             notification.mark_admin_email_sent()
             logger.info(
-                f"Admin notification sent for contact submission {contact_submission.id}"
+                "Admin notification sent for contact submission %s", contact_submission.id
             )
-            print(f"      ✅ Admin email sent successfully")
             return True
 
         except Exception as e:
             error_msg = str(e)
-            logger.error(f"Failed to send admin notification: {error_msg}")
-            print(f"      ❌ Failed to send admin email: {error_msg}")
-            import traceback
-
-            traceback.print_exc()
+            logger.exception("Failed to send admin notification")
             try:
                 notification.mark_admin_email_sent(error=error_msg)
             except Exception as inner_e:
-                logger.error(f"Failed to mark admin email as failed: {str(inner_e)}")
+                logger.error("Failed to mark admin email as failed: %s", inner_e)
             return False
 
     def send_thankyou_notification(self, contact_submission, notification):
         """
         Send thank you email to user who submitted contact form
         """
-        print(f"   📧 send_thankyou_notification() called")
-        print(
-            f"      Thank you notifications enabled: {self.settings.thankyou_notification_enabled}"
-        )
+        logger.debug("send_thankyou_notification() called, enabled=%s", self.settings.thankyou_notification_enabled)
 
         if not self.settings.thankyou_notification_enabled:
             logger.info("Thank you notifications are disabled")
-            print(f"      ⚠️  Thank you notifications are DISABLED in settings")
             return False
 
         try:
@@ -120,13 +102,13 @@ class EmailNotificationService:
                 subject = template.subject
                 html_content = template.html_content
                 text_content = template.text_content
-                print(f"      Using custom template: {template.name}")
+                logger.debug("Using custom template: %s", template.name)
             else:
                 # Default template
                 subject = "Thank you for contacting us!"
                 html_content = self._get_default_thankyou_html_template()
                 text_content = self._get_default_thankyou_text_template()
-                print(f"      Using default template")
+                logger.debug("Using default template")
 
             # Prepare template context
             context = {
@@ -145,10 +127,7 @@ class EmailNotificationService:
             rendered_text = self._render_template_string(text_content, context)
             rendered_subject = self._render_template_string(subject, context)
 
-            print(f"      From: {self.settings.from_email}")
-            print(f"      To: {contact_submission.email}")
-            print(f"      Reply-To: {self.settings.reply_to_email}")
-            print(f"      Subject: {rendered_subject}")
+            logger.debug("Sending thank-you email from=%s to=%s", self.settings.from_email, contact_submission.email)
 
             # Send email
             from django.core.mail import EmailMultiAlternatives
@@ -165,22 +144,17 @@ class EmailNotificationService:
 
             notification.mark_thankyou_email_sent()
             logger.info(
-                f"Thank you notification sent for contact submission {contact_submission.id}"
+                "Thank you notification sent for contact submission %s", contact_submission.id
             )
-            print(f"      ✅ Thank you email sent successfully")
             return True
 
         except Exception as e:
             error_msg = str(e)
-            logger.error(f"Failed to send thank you notification: {error_msg}")
-            print(f"      ❌ Failed to send thank you email: {error_msg}")
-            import traceback
-
-            traceback.print_exc()
+            logger.exception("Failed to send thank you notification")
             try:
                 notification.mark_thankyou_email_sent(error=error_msg)
             except Exception as inner_e:
-                logger.error(f"Failed to mark thankyou email as failed: {str(inner_e)}")
+                logger.error("Failed to mark thankyou email as failed: %s", inner_e)
             return False
 
     def _get_template(self, template_type):
@@ -193,21 +167,16 @@ class EmailNotificationService:
             return None
 
     def _render_template_string(self, template_string, context):
-        """Render template string with context variables"""
-        try:
-            from django.template import Template, Context
+        """Render template string with context variables using safe string replacement.
 
-            template = Template(template_string)
-            return template.render(Context(context))
-        except Exception as e:
-            logger.error(f"Template rendering error: {str(e)}")
-            # Return template with basic string replacement as fallback
-            result = template_string
-            for key, value in context.items():
-                result = result.replace(f"{{{{ {key} }}}}", str(value))
-                # Also handle with spaces around variable name
-                result = result.replace(f"{{{{  {key}  }}}}", str(value))
-            return result
+        Uses simple {{variable}} replacement instead of Django's Template engine
+        to prevent server-side template injection (SSTI) from DB-stored templates.
+        """
+        result = template_string
+        for key, value in context.items():
+            result = result.replace("{{ " + key + " }}", str(value))
+            result = result.replace("{{" + key + "}}", str(value))
+        return result
 
     def _get_default_admin_html_template(self):
         """Default HTML template for admin notification"""

@@ -21,7 +21,8 @@
 .legal-content {
     padding: 30px 0;
     position: relative;
-    z-index: 1; /* Ensure content doesn't interfere with navbar */
+    z-index: 1;
+    /* Ensure content doesn't interfere with navbar */
 }
 
 .legal-content .container {
@@ -187,37 +188,37 @@
     .legal-content {
         padding: 40px 0;
     }
-    
+
     .legal-content .container {
         padding: 0 15px;
     }
-    
+
     .legal-header h1 {
         font-size: 36px;
     }
-    
+
     .legal-header {
         margin-bottom: 30px;
         padding-bottom: 20px;
     }
-    
+
     .legal-section {
         padding: 20px;
         margin-bottom: 25px;
     }
-    
+
     .legal-section h2 {
         font-size: 24px;
     }
-    
+
     .legal-section h3 {
         font-size: 18px;
     }
-    
+
     .legal-body {
         font-size: 15px;
     }
-    
+
     .legal-section ul {
         padding-left: 20px;
     }
@@ -227,19 +228,19 @@
     .legal-header h1 {
         font-size: 28px;
     }
-    
+
     .legal-section {
         padding: 15px;
     }
-    
+
     .legal-section h2 {
         font-size: 22px;
     }
-    
+
     .legal-section h3 {
         font-size: 16px;
     }
-    
+
     .legal-body {
         font-size: 14px;
         line-height: 1.6;
@@ -262,23 +263,23 @@
         background: white;
         color: black;
     }
-    
+
     .legal-section {
         background: white;
         box-shadow: none;
         border: 1px solid #ddd;
         break-inside: avoid;
     }
-    
+
     .legal-header h1 {
         color: black;
     }
-    
+
     .legal-section h2,
     .legal-section h3 {
         color: black;
     }
-    
+
     .legal-section a {
         color: #0066cc;
         text-decoration: underline;
@@ -286,120 +287,10 @@
 }
 
 /* =========================================================================
-   ANIMATIONS & INTERSECTIONS
+   ANIMATIONS (base styles in animations.css)
    ========================================================================= */
 
-/* ========== Base Animation States ========== */
-[data-animation] {
-    /* Content is visible by default, animations are enhancements */
-    transition: all 0.8s ease;
-}
-
-[data-animation].is-visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-[data-animation="fade-in-up"] {
-    /* Start visible, animate from current position */
-    transition: all 0.8s ease;
-}
-
-[data-animation="fade-in-up"].is-visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-[data-animation="fade-in-left"] {
-    opacity: 0;
-    transform: translateX(-30px);
-}
-
-[data-animation="fade-in-left"].is-visible {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-[data-animation="fade-in-right"] {
-    opacity: 0;
-    transform: translateX(30px);
-}
-
-[data-animation="fade-in-right"].is-visible {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-[data-animation="fade-in"] {
-    opacity: 0;
-}
-
-[data-animation="fade-in"].is-visible {
-    opacity: 1;
-}
-
-/* ========== Animation Delays ========== */
-[data-animation-delay="100"].is-visible {
-    transition-delay: 0.1s;
-}
-
-[data-animation-delay="200"].is-visible {
-    transition-delay: 0.2s;
-}
-
-[data-animation-delay="300"].is-visible {
-    transition-delay: 0.3s;
-}
-
-[data-animation-delay="400"].is-visible {
-    transition-delay: 0.4s;
-}
-
-[data-animation-delay="500"].is-visible {
-    transition-delay: 0.5s;
-}
-
-/* ========== Keyframe Animations ========== */
-@keyframes fade-in-up {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fade-in-left {
-    from {
-        opacity: 0;
-        transform: translateX(-30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes fade-in-right {
-    from {
-        opacity: 0;
-        transform: translateX(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes background-pan {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-/* ========== Legal Section Animations ========== */
+/* Legal-specific animation overrides */
 .legal-section {
     /* Remove opacity: 0 to ensure content is always visible */
     transition: all 0.6s ease;

@@ -93,24 +93,6 @@ class MockAPIResponse:
         return str(self.json_data)
 
 
-def create_mock_spotify_response():
-    """Create a mock Spotify API response."""
-    return MockAPIResponse(
-        {
-            "tracks": {
-                "items": [
-                    {
-                        "name": "Test Song",
-                        "artists": [{"name": "Test Artist"}],
-                        "album": {"name": "Test Album"},
-                        "preview_url": "https://example.com/preview.mp3",
-                    }
-                ]
-            }
-        }
-    )
-
-
 def create_mock_gemini_response():
     """Create a mock Gemini API response."""
     return MockAPIResponse(

@@ -70,303 +70,353 @@
 {% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/home.css' %}">
-    <link rel="stylesheet" href="{% static 'css/ai_query.css' %}">
-    <link rel="stylesheet" href="{% static 'css/achievements.css' %}">
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link rel="stylesheet" href="{% static 'css/ai_query.css' %}">
+<link rel="stylesheet" href="{% static 'css/achievements.css' %}">
 {% endblock %}
 
 {% block extra_js %}
-    <script src="{% static 'js/home.js' %}" defer></script>
-    <script src="{% static 'js/contact_form.js' %}" defer></script>
-    <script src="{% static 'js/newsletter_form.js' %}" defer></script>
+<script src="{% static 'js/home.js' %}" defer></script>
+<script src="{% static 'js/contact_form.js' %}" defer></script>
+<script src="{% static 'js/newsletter_form.js' %}" defer></script>
 {% endblock %}
 
 {% load sanitize_extras %}
 
 {% block content %}
-    <!-- ========================= 1. HERO SECTION ========================= -->
-    <section class="hero-section portfolio-container">
-        <div class="home-container">
-            <div class="home-content" data-animation="fade-in-up">
-                <p>👋 HII It's Me</p>
-                <h1>Roshan Damor <br>a <span>Full Stack Developer</span></h1>
-                <p>🙏 GREETINGS, ALL DIGITAL EXPLORERS! I AM ROSHAN, A PASSIONATE AND INNOVATIVE DEVELOPER <b><i>"BUILDING AI-POWERED SOLUTIONS & SCALABLE WEB APPS — SDE & AI ENGINEER"</i></b> </p>
-                <!-- Hero Action Buttons -->
-                <div class="hero-actions">
-                    <a type="button" class="filled-btn" id="open-ai-modal">
-                        <i class="fas fa-robot"></i>
-                        Ask AI
-                    </a>
-                    <a href="{% url 'roshan:about' %}" class="outline-btn">
-                        <i class="fa-solid fa-user"></i>
-                        About Me
-                    </a>
+<!-- ========================= 1. HERO SECTION ========================= -->
+<section class="hero-section portfolio-container">
+    <div class="home-container">
+        <div class="home-content" data-animation="fade-in-up">
+            <p>👋 HII It's Me</p>
+            <h1>Roshan Damor <br>a <span>Full Stack Developer</span></h1>
+            <p>🙏 GREETINGS, ALL DIGITAL EXPLORERS! I AM ROSHAN, A PASSIONATE AND INNOVATIVE DEVELOPER <b><i>"BUILDING
+                        AI-POWERED SOLUTIONS & SCALABLE WEB APPS — SDE & AI ENGINEER"</i></b> </p>
+            <!-- Hero Action Buttons -->
+            <div class="hero-actions">
+                <a type="button" class="filled-btn" id="open-ai-modal">
+                    <i class="fas fa-robot"></i>
+                    Ask AI
+                </a>
+                <a href="{% url 'roshan:about' %}" class="outline-btn">
+                    <i class="fa-solid fa-user"></i>
+                    About Me
+                </a>
+            </div>
+        </div>
+        <div class="home-hero-image" data-animation="zoom-in">
+            <img src="{% static 'images/hero.png' %}" alt="Roshan Damor - Hero Image">
+            <!-- DYNAMIC: Stats from SiteConfiguration model -->
+            <div class="hero-stat-card stat-1 card" data-animation="fade-in" data-animation-delay="200">
+                <i class="fa-solid fa-trophy stat-icon"></i>
+                <div class="stat-text">
+                    <div class="stat-number">{{ config.hero_hackathons_count|default:"12+" }}</div>
+                    <div class="stat-label">Hackathons</div>
                 </div>
             </div>
-            <div class="home-hero-image" data-animation="zoom-in">
-                <img src="{% static 'images/hero.png' %}" alt="Roshan Damor - Hero Image">
-                <!-- DYNAMIC: Stats from SiteConfiguration model -->
-                <div class="hero-stat-card stat-1 card" data-animation="fade-in" data-animation-delay="200">
-                    <i class="fa-solid fa-trophy stat-icon"></i>
-                    <div class="stat-text"><div class="stat-number">{{ config.hero_hackathons_count|default:"12+" }}</div><div class="stat-label">Hackathons</div></div>
+            <div class="hero-stat-card stat-2 card" data-animation="fade-in" data-animation-delay="400">
+                <i class="fa-solid fa-code stat-icon"></i>
+                <div class="stat-text">
+                    <div class="stat-number">{{ config.hero_leetcode_rating|default:"1800+" }}</div>
+                    <div class="stat-label">LeetCode Rating</div>
                 </div>
-                <div class="hero-stat-card stat-2 card" data-animation="fade-in" data-animation-delay="400">
-                    <i class="fa-solid fa-code stat-icon"></i>
-                    <div class="stat-text"><div class="stat-number">{{ config.hero_leetcode_rating|default:"1800+" }}</div><div class="stat-label">LeetCode Rating</div></div>
-                </div>
-                <div class="hero-stat-card stat-3 card" data-animation="fade-in" data-animation-delay="600">
-                    <i class="fa-brands fa-github stat-icon"></i>
-                    <div class="stat-text"><div class="stat-number">{{ config.hero_opensource_contributions|default:"50+" }}</div><div class="stat-label">Open Source</div></div>
+            </div>
+            <div class="hero-stat-card stat-3 card" data-animation="fade-in" data-animation-delay="600">
+                <i class="fa-brands fa-github stat-icon"></i>
+                <div class="stat-text">
+                    <div class="stat-number">{{ config.hero_opensource_contributions|default:"50+" }}</div>
+                    <div class="stat-label">Open Source</div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- ========================= 2. SKILLS SECTION ========================= -->
-    <section id="skills" class="skills-section portfolio-container" data-animation="fade-in">
-        <div class="section-title">
-            <h2>My Tech <span>Skills</span></h2>
-        </div>
-        <div class="skills-grid">
-            {% for category in skill_categories %}
-            <a href="{% url 'portfolio:skill_detail' slug=category.main_skill.slug %}" class="skill-category-card" data-animation="fade-in-up">
-                <div class="skill-card-header">
-                    <div class="skill-category-icon">
-                        <i class="{{ category.main_skill.icon }}"></i>
-                    </div>
-                    <h3>{{ category.name }}</h3>
+<!-- ========================= 2. SKILLS SECTION ========================= -->
+<section id="skills" class="skills-section portfolio-container" data-animation="fade-in">
+    <div class="section-title">
+        <h2>My Tech <span>Skills</span></h2>
+    </div>
+    <div class="skills-grid">
+        {% for category in skill_categories %}
+        <a href="{% url 'portfolio:skill_detail' slug=category.main_skill.slug %}" class="skill-category-card"
+            data-animation="fade-in-up">
+            <div class="skill-card-header">
+                <div class="skill-category-icon">
+                    <i class="{{ category.main_skill.icon }}"></i>
                 </div>
-                <div class="skill-technologies">
-                    {% for tech in category.technologies %}
-                    <span class="tech-tag">
-                        <i class="{{ tech.icon }}"></i>
-                        {{ tech.name }}
+                <h3>{{ category.name }}</h3>
+            </div>
+            <div class="skill-technologies">
+                {% for tech in category.technologies %}
+                <span class="tech-tag">
+                    <i class="{{ tech.icon }}"></i>
+                    {{ tech.name }}
+                </span>
+                {% endfor %}
+            </div>
+            <div class="skill-card-footer">
+                <span class="skills-count">{{ category.skills_count }} skill{{ category.skills_count|pluralize }}</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- ========================= 3. EXPERIENCE SECTION ========================= -->
+<section id="experience" class="experience-section portfolio-container" data-animation="fade-in">
+    <div class="section-title">
+        <h2>My Work <span>Experiences</span></h2>
+    </div>
+    <div class="experience-grid">
+        {% for exp in experiences %}
+        <div class="exp-card card clickable-card" data-animation="fade-in-up"
+            data-url="{% url 'portfolio:experience_detail' pk=exp.pk %}">
+            <div class="exp-img"><img
+                    src="{% if exp.company_logo %}{{ exp.company_logo.url }}{% else %}https://placehold.co/80x80/010409/eaeaea?text={{ exp.company_name|slice:':2' }}{% endif %}"
+                    alt="{{ exp.company_name }} Logo"></div>
+            <div class="exp-details">
+                <div class="exp-header">
+                    <h3>{{ exp.role }} @ <i>{{ exp.company_name }}</i></h3>
+                    <span>{{ exp.start_date|date:"M Y" }} -
+                        {% if exp.end_date %}{{ exp.end_date|date:"M Y" }}{% else %}Present{% endif %}
                     </span>
+                </div>
+                <p>{{ exp.summary|truncatewords:40|safe }}</p>
+                <div class="skills">
+                    {% for tech in exp.technologies.all %}
+                    <span class="teg">{{ tech.name }}</span>
                     {% endfor %}
                 </div>
-                <div class="skill-card-footer">
-                    <span class="skills-count">{{ category.skills_count }} skill{{ category.skills_count|pluralize }}</span>
-                </div>
-            </a>
-            {% endfor %}
-        </div>
-    </section>
-
-    <!-- ========================= 3. EXPERIENCE SECTION ========================= -->
-    <section id="experience" class="experience-section portfolio-container" data-animation="fade-in">
-        <div class="section-title">
-            <h2>My Work <span>Experiences</span></h2>
-        </div>
-        <div class="experience-grid">
-            {% for exp in experiences %}
-            <div class="exp-card card clickable-card" data-animation="fade-in-up"
-                data-url="{% url 'portfolio:experience_detail' pk=exp.pk %}">
-                <div class="exp-img"><img src="{% if exp.company_logo %}{{ exp.company_logo.url }}{% else %}https://placehold.co/80x80/010409/eaeaea?text={{ exp.company_name|slice:':2' }}{% endif %}" alt="{{ exp.company_name }} Logo"></div>
-                <div class="exp-details">
-                    <div class="exp-header">
-                        <h3>{{ exp.role }} @ <i>{{ exp.company_name }}</i></h3>
-                        <span>{{ exp.start_date|date:"M Y" }} - {% if exp.end_date %}{{ exp.end_date|date:"M Y" }}{% else %}Present{% endif %}</span>
-                    </div>
-                    <p>{{ exp.summary|truncatewords:40|safe }}</p>
-                    <div class="skills">{% for tech in exp.technologies.all %}<span class="teg">{{ tech.name }}</span>{% endfor %}</div>
-                </div>
             </div>
-            {% endfor %}
         </div>
-    </section>
+        {% endfor %}
+    </div>
+</section>
 
-    <!-- ========================= 4. PROJECTS SECTION ========================= -->
-    <section class="projects-section portfolio-container">
-        <div class="section-title" data-animation="fade-in-up">
-            <h2>My Featured <span>Projects</span></h2>
-        </div>
-        <div class="cards-container">
-            {% for project in projects %}
-            <div class="project-card card clickable-card" data-animation="fade-in-up" data-url="{% url 'portfolio:project_detail' slug=project.slug %}">
-                <div class="project-media">
-                    {% if project.youtube_video_id %}
-                        <div class="youtube-video-container">
-                            <iframe 
-                                src="https://www.youtube.com/embed/{{ project.youtube_video_id }}?rel=0&modestbranding=1&showinfo=0" 
-                                frameborder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                allowfullscreen
-                                loading="lazy"
-                                title="{{ project.title }} - YouTube Video">
-                            </iframe>
-                        </div>
-                    {% elif project.cover_image %}
-                        <img src="{{ project.cover_image.url }}" alt="{{ project.title }}" class="project-image">
-                    {% else %}
-                        <img src="https://placehold.co/1920x1080/010409/eaeaea?text={{ project.title|urlencode }}" alt="{{ project.title }}" class="project-image placeholder">
-                    {% endif %}
+<!-- ========================= 4. PROJECTS SECTION ========================= -->
+<section class="projects-section portfolio-container">
+    <div class="section-title" data-animation="fade-in-up">
+        <h2>My Featured <span>Projects</span></h2>
+    </div>
+    <div class="cards-container">
+        {% for project in projects %}
+        <div class="project-card card clickable-card" data-animation="fade-in-up"
+            data-url="{% url 'portfolio:project_detail' slug=project.slug %}">
+            <div class="project-media">
+                {% if project.youtube_embed_url %}
+                <div class="youtube-video-container">
+                    <iframe src="{{ project.youtube_embed_url }}" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen loading="lazy" title="{{ project.title }} - YouTube Video">
+                    </iframe>
                 </div>
-                <div class="project-content">
-                    <h3>{{ project.title }}</h3>
-                    <div class="skills">
-                        {% for tech in project.technologies.all|slice:":5" %}
-                        <span class="teg">{{ tech.name }}</span>
-                        {% endfor %}
-                        {% if project.technologies.count > 5 %}
-                        <span class="teg more-tech">+{{ project.technologies.count|add:"-5" }} more</span>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="project-links">
-                    {% if project.github_url %}
-                    <a href="{{ project.github_url }}" class="outline-btn" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();">
-                        <i class="fa-brands fa-github"></i>Github
-                    </a>
-                    {% endif %}
-                    {% if project.live_url %}
-                    <a href="{{ project.live_url }}" class="outline-btn" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i>Live
-                    </a>
-                    {% endif %}
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </section>
-
-    <!-- ========================= 5. BLOGS SECTION ========================= -->
-    <section class="blogs-section portfolio-container">
-        <div class="section-title" data-animation="fade-in-up">
-            <h2>Latest I've <span>Written</span></h2>
-        </div>
-        <div class="cards-container">
-            {% for blog in blogs %}
-            <div class="blog-card card clickable-card" data-animation="fade-in-up"
-                data-url="{% url 'blog:blog_detail' slug=blog.slug %}">
-                <div class="blog-image">
-                    <img src="{% if blog.cover_image %}{{ blog.cover_image.url }}{% else %}https://placehold.co/600x400/010409/eaeaea?text={{ blog.title|urlencode }}{% endif %}" alt="{{ blog.title }}">
-                    <div class="read-time"><span class="teg">{{ blog.reading_time }} min read</span></div>
-                </div>
-                <div class="blog-content">
-                    <h4>{{ blog.title }}</h4>
-                    <p>{{ blog.summary|truncatewords:20|safe }}</p>
-                </div>
-                <div class="blog-footer">
-                    <div class="publisher">
-                        {% if blog.author_avatar %}
-                        <img src="{{ blog.author_avatar.url }}" alt="{{ blog.author_name }}">
-                        {% endif %}
-                        <span>{{ blog.author_name }}</span>
-                    </div>
-                    <span class="blog-date">{{ blog.created_date|date:"M d, Y" }}</span>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </section>
-
-    <!-- ========================= 6. NEWSLETTER CTA SECTION (NEW) ========================= -->
-    <section id="newsletter" class="cta-section portfolio-container portfolio" data-animation="fade-in">
-        <header></header> {# This header is empty, consider removing if not needed for styling #}
-        <div class="cta-container card">
-            <div class="cta-left-content">
-                <h2><i class="fa-solid fa-paper-plane"></i> Subscribe for <span>Updates</span></h2>
-            </div>
-            <div class="cta-right-content">
-                <!-- Message Display Area -->
-                {% if messages %}
-                    <div class="newsletter-messages">
-                        {% for message in messages %}
-                            <div class="message {{ message.tags }}">{{ message }}</div>
-                        {% endfor %}
-                    </div>
+                {% elif project.cover_image %}
+                <img src="{{ project.cover_image.url }}" alt="{{ project.title }}" class="project-image">
+                {% else %}
+                <img src="https://placehold.co/1920x1080/010409/eaeaea?text={{ project.title|urlencode }}"
+                    alt="{{ project.title }}" class="project-image placeholder">
                 {% endif %}
-                <!-- Newsletter Form -->
-                <form id="newsletter-form" class="cta-form" method="post" action="{% url 'portfolio:subscribe_home' %}">
-                    {% csrf_token %}
-                    <input type="email" name="email" id="newsletter-email" placeholder="Enter your email address" aria-label="Enter your email address to subscribe" required>
-                    <button type="submit" class="filled-btn" id="newsletter-submit-btn">Subscribe</button>
-                </form>
+            </div>
+            <div class="project-content">
+                <h3>{{ project.title }}</h3>
+                <div class="skills">
+                    {% for tech in project.technologies.all|slice:":5" %}
+                    <span class="teg">{{ tech.name }}</span>
+                    {% endfor %}
+                    {% if project.technologies.count > 5 %}
+                    <span class="teg more-tech">+{{ project.technologies.count|add:"-5" }} more</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="project-links">
+                {% if project.github_url %}
+                <a href="{{ project.github_url }}" class="outline-btn" target="_blank" rel="noopener noreferrer"
+                    onclick="event.stopPropagation();">
+                    <i class="fa-brands fa-github"></i>Github
+                </a>
+                {% endif %}
+                {% if project.live_url %}
+                <a href="{{ project.live_url }}" class="outline-btn" target="_blank" rel="noopener noreferrer"
+                    onclick="event.stopPropagation();">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>Live
+                </a>
+                {% endif %}
             </div>
         </div>
-    </section>
+        {% endfor %}
+    </div>
+</section>
 
-    <!-- ========================= 7. CONTACT SECTION ========================= -->
-    <section id="contact" class="contact-section portfolio-container" data-animation="fade-in">
-        <div class="section-title"><h2>Let's Get <span>Connected!</span></h2></div>
-        <div class="contact-wrapper card">
-            <div class="mail-contact-card">
-                <div class="left-contact-info">
-                    <h3>Contact Information</h3><p>Have a project in mind or just want to say hello? Feel free to reach out.</p>
-                    <ul class="contact-details-list">
-                        <li><i class="fa-solid fa-phone"></i><span>{% if config.phone %}<a href="tel:{{ config.phone }}">{{ config.phone }}</a>{% else %}Not provided{% endif %}</span></li> {# Added tel: link #}
-                        <li><i class="fa-solid fa-envelope"></i><span>{% if config.email %}<a href="mailto:{{ config.email }}">{{ config.email }}</a>{% else %}Not provided{% endif %}</span></li> {# Added mailto: link #}
-                        <li><i class="fa-solid fa-location-dot"></i><span>{% if config.location %}{{ config.location }}{% else %}Not provided{% endif %}</span></li>
-                    </ul>
-                    
-                    <!-- Urgent Toggle Section -->
-                    <div class="urgent-toggle-section">
-                        <div class="urgent-toggle-wrapper">
-                            <label class="toggle-switch" for="urgent-toggle">
-                                <input type="checkbox" id="urgent-toggle" name="is_urgent">
-                                <span class="toggle-slider"></span>
-                            </label>
-                            <div class="toggle-label">
-                                <span class="toggle-text">Urgent Response</span>
-                                <i class="fa-solid fa-exclamation-triangle urgent-icon"></i>
-                            </div>
+<!-- ========================= 5. BLOGS SECTION ========================= -->
+<section class="blogs-section portfolio-container">
+    <div class="section-title" data-animation="fade-in-up">
+        <h2>Latest I've <span>Written</span></h2>
+    </div>
+    <div class="cards-container">
+        {% for blog in blogs %}
+        <div class="blog-card card clickable-card" data-animation="fade-in-up"
+            data-url="{% url 'blog:blog_detail' slug=blog.slug %}">
+            <div class="blog-image">
+                <img src="{% if blog.cover_image %}{{ blog.cover_image.url }}{% else %}https://placehold.co/600x400/010409/eaeaea?text={{ blog.title|urlencode }}{% endif %}"
+                    alt="{{ blog.title }}">
+                <div class="read-time"><span class="teg">{{ blog.reading_time }} min read</span></div>
+            </div>
+            <div class="blog-content">
+                <h4>{{ blog.title }}</h4>
+                <p>{{ blog.summary|truncatewords:20|safe }}</p>
+            </div>
+            <div class="blog-footer">
+                <div class="publisher">
+                    {% if blog.author_avatar %}
+                    <img src="{{ blog.author_avatar.url }}" alt="{{ blog.author_name }}">
+                    {% endif %}
+                    <span>{{ blog.author_name }}</span>
+                </div>
+                <span class="blog-date">{{ blog.created_date|date:"M d, Y" }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- ========================= 6. NEWSLETTER CTA SECTION (NEW) ========================= -->
+<section id="newsletter" class="cta-section portfolio-container portfolio" data-animation="fade-in">
+    <header></header> 
+    <div class="cta-container card">
+        <div class="cta-left-content">
+            <h2><i class="fa-solid fa-paper-plane"></i> Subscribe for <span>Updates</span></h2>
+        </div>
+        <div class="cta-right-content">
+            <!-- Message Display Area -->
+            {% if messages %}
+            <div class="newsletter-messages">
+                {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <!-- Newsletter Form -->
+            <form id="newsletter-form" class="cta-form" method="post" action="{% url 'portfolio:subscribe_home' %}">
+                {% csrf_token %}
+                <input type="email" name="email" id="newsletter-email" placeholder="Enter your email address"
+                    aria-label="Enter your email address to subscribe" required>
+                <button type="submit" class="filled-btn" id="newsletter-submit-btn">Subscribe</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- ========================= 7. CONTACT SECTION ========================= -->
+<section id="contact" class="contact-section portfolio-container" data-animation="fade-in">
+    <div class="section-title">
+        <h2>Let's Get <span>Connected!</span></h2>
+    </div>
+    <div class="contact-wrapper card">
+        <div class="mail-contact-card">
+            <div class="left-contact-info">
+                <h3>Contact Information</h3>
+                <p>Have a project in mind or just want to say hello? Feel free to reach out.</p>
+                <ul class="contact-details-list">
+                    <li><i class="fa-solid fa-phone"></i><span>{% if config.phone %}<a href="tel:{{ config.phone }}">{{
+                                config.phone }}</a>{% else %}Not provided{% endif %}</span></li> 
+                    <li>
+                        <i class="fa-solid fa-envelope"></i>
+                        <span>
+                            {% if config.email %}
+                            <a href="mailto:{{ config.email }}">{{ config.email }}</a>
+                            {% else %}Not provided{% endif %}
+                        </span>
+                    </li>
+                    <li>
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span>
+                            {% if config.location %}{{ config.location }}{% else %}Not provided{% endif %}
+                        </span>
+                    </li>
+                </ul>
+
+                <!-- Urgent Toggle Section -->
+                <div class="urgent-toggle-section">
+                    <div class="urgent-toggle-wrapper">
+                        <label class="toggle-switch" for="urgent-toggle">
+                            <input type="checkbox" id="urgent-toggle" name="is_urgent">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <div class="toggle-label">
+                            <span class="toggle-text">Urgent Response</span>
+                            <i class="fa-solid fa-exclamation-triangle urgent-icon"></i>
                         </div>
                         <div class="urgent-warning" id="urgent-warning">
-                            <p><i class="fa-solid fa-warning"></i> <strong>Warning:</strong> Use only for genuinely urgent matters. Misuse of this feature may result in your email being blocked from accessing this website.</p>
+                            <p><i class="fa-solid fa-warning"></i> <strong>Warning:</strong> Use only for genuinely
+                                urgent matters. Misuse may result in blocking.</p>
                         </div>
                     </div>
                 </div>
-                <div class="right-contact-form">
-                    <form id="contact-form" method="post" action="{% url 'portfolio:contact_submit' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="is_urgent" id="urgent-hidden-input" value="false">
-                        <div class="form-group-row"><div class="form-group"><label for="name">Your Name</label><input type="text" name="name" id="name" autocomplete="name" required></div><div class="form-group"><label for="email">Your Email</label><input type="email" name="email" id="email" autocomplete="email" required></div></div> {# Added autocomplete attributes #}
-                        <div class="form-group"><label for="subject">Your Subject</label><input type="text" name="subject" id="subject" autocomplete="on"></div> {# Added autocomplete attribute #}
-                        <div class="form-group"><label for="contact-message">Your Message</label><textarea name="message" id="contact-message" rows="4" required></textarea></div>
-                        <button type="submit" class="outline-btn" id="contact-submit-btn">Send Message</button>
-                    </form>
-                </div>
             </div>
-        </div>
-    </section>
-
-    <!-- AI Chat Modal -->
-    <div class="ai-modal" id="ai-chat-modal">
-        <div class="ai-modal-overlay" id="ai-modal-overlay"></div>
-        <div class="ai-modal-container">
-            <div class="ai-modal-header">
-                <div class="ai-modal-title">
-                    <div class="ai-avatar">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <h3>Chat with Rexi AI</h3>
-                </div>
-                <button type="button" class="ai-modal-close" id="close-ai-modal" aria-label="Close AI chat modal"> {# Added aria-label #}
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="ai-chat-interface">
-                <div class="ai-chat-messages" id="ai-chat-messages">
-                </div>
-                <!-- Input form -->
-                <form id="ai-form" class="ai-query-form" action="{% url 'ai:submit_ai_query' %}" method="POST" enctype="multipart/form-data">
+            <div class="right-contact-form">
+                <form id="contact-form" method="post" action="{% url 'portfolio:contact_submit' %}">
                     {% csrf_token %}
-                    <div class="input-container">
-                        <div class="textarea-container">
-                            <textarea name="question" placeholder="Ask anything about me, e.g., 'What are your key skills?' (Ctrl+Enter to send)" rows="1" maxlength="1000" aria-label="Type your question for the AI assistant"></textarea> {# Added aria-label #}
-                            <div class="char-count">
-                                <span id="char-counter">0</span>/1000
-                            </div>
-                        </div>
-                        <button type="submit" class="submit-btn" title="Send Message (Ctrl+Enter)" aria-label="Send message to AI assistant"> {# Added aria-label #}
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                    <div id="file-display-container"></div>
+                    <input type="hidden" name="is_urgent" id="urgent-hidden-input" value="false">
+                    <div class="form-group-row">
+                        <div class="form-group"><label for="name">Your Name</label><input type="text" name="name"
+                                id="name" autocomplete="name" required></div>
+                        <div class="form-group"><label for="email">Your Email</label><input type="email" name="email"
+                                id="email" autocomplete="email" required></div>
+                    </div> 
+                    <div class="form-group"><label for="subject">Your Subject</label><input type="text" name="subject"
+                            id="subject" autocomplete="on"></div> 
+                    <div class="form-group"><label for="contact-message">Your Message</label><textarea name="message"
+                            id="contact-message" rows="6" required></textarea></div>
+                    <button type="submit" class="outline-btn" id="contact-submit-btn">Send Message</button>
                 </form>
             </div>
         </div>
     </div>
+</section>
+
+<!-- AI Chat Modal -->
+<div class="ai-modal" id="ai-chat-modal">
+    <div class="ai-modal-overlay" id="ai-modal-overlay"></div>
+    <div class="ai-modal-container">
+        <div class="ai-modal-header">
+            <div class="ai-modal-title">
+                <div class="ai-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3>Chat with Rexi AI</h3>
+            </div>
+            <button type="button" class="ai-modal-close" id="close-ai-modal" aria-label="Close AI chat modal"> 
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="ai-chat-interface">
+            <div class="ai-chat-messages" id="ai-chat-messages">
+            </div>
+            <!-- Input form -->
+            <form id="ai-form" class="ai-query-form" action="{% url 'ai:submit_ai_query' %}" method="POST"
+                enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="input-container">
+                    <div class="textarea-container">
+                        <textarea name="question"
+                            placeholder="Ask anything about me, e.g., 'What are your key skills?' (Ctrl+Enter to send)"
+                            rows="1" maxlength="1000" aria-label="Type your question for the AI assistant"></textarea>
+                        
+                        <div class="char-count">
+                            <span id="char-counter">0</span>/1000
+                        </div>
+                    </div>
+                    <button type="submit" class="submit-btn" title="Send Message (Ctrl+Enter)"
+                        aria-label="Send message to AI assistant"> 
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div id="file-display-container"></div>
+            </form>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
