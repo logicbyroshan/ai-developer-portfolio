@@ -10,7 +10,7 @@
     --accent-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
     --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
     --error-gradient: linear-gradient(135deg, #ff6b6b 0%, #ffa726 100%);
-    
+
     /* Light Theme Text & Background */
     --bg-primary: #ffffff;
     --bg-secondary: #f8f9fa;
@@ -21,9 +21,9 @@
     --text-inverse: #ffffff;
     --border-color: #dee2e6;
     --border-light: #f0f0f0;
-    --shadow-light: rgba(0,0,0,0.1);
-    --shadow-medium: rgba(0,0,0,0.15);
-    
+    --shadow-light: rgba(0, 0, 0, 0.1);
+    --shadow-medium: rgba(0, 0, 0, 0.15);
+
     /* Form Elements */
     --input-bg: #ffffff;
     --input-border: #dee2e6;
@@ -40,7 +40,7 @@
         --accent-gradient: linear-gradient(135deg, #ed64a6 0%, #d53f8c 100%);
         --success-gradient: linear-gradient(135deg, #38b2ac 0%, #319795 100%);
         --error-gradient: linear-gradient(135deg, #fc8181 0%, #e53e3e 100%);
-        
+
         /* Dark Theme Text & Background */
         --bg-primary: #1a202c;
         --bg-secondary: #2d3748;
@@ -51,9 +51,9 @@
         --text-inverse: #1a202c;
         --border-color: #4a5568;
         --border-light: #718096;
-        --shadow-light: rgba(0,0,0,0.3);
-        --shadow-medium: rgba(0,0,0,0.4);
-        
+        --shadow-light: rgba(0, 0, 0, 0.3);
+        --shadow-medium: rgba(0, 0, 0, 0.4);
+
         /* Form Elements */
         --input-bg: #2d3748;
         --input-border: #4a5568;
@@ -81,12 +81,12 @@
 }
 
 #user-tools {
-    color: rgba(255,255,255,0.9);
+    color: rgba(255, 255, 255, 0.9);
 }
 
 #user-tools a {
-    color: rgba(255,255,255,0.9);
-    border-bottom: 1px solid rgba(255,255,255,0.3);
+    color: rgba(255, 255, 255, 0.9);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     padding-bottom: 2px;
 }
 
@@ -152,7 +152,10 @@
 }
 
 /* Action Buttons */
-.button, input[type="submit"], input[type="button"], .submit-row input {
+.button,
+input[type="submit"],
+input[type="button"],
+.submit-row input {
     background: var(--primary-gradient);
     border: none;
     color: var(--text-inverse);
@@ -163,13 +166,16 @@
     cursor: pointer;
 }
 
-.button:hover, input[type="submit"]:hover, input[type="button"]:hover {
+.button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px var(--shadow-medium);
     opacity: 0.9;
 }
 
-.button.default, .default {
+.button.default,
+.default {
     background: var(--success-gradient);
     color: var(--text-inverse);
 }
@@ -179,8 +185,12 @@
 }
 
 /* Button text contrast fix */
-.button, input[type="submit"], input[type="button"], .submit-row input,
-.button.default, .default {
+.button,
+input[type="submit"],
+input[type="button"],
+.submit-row input,
+.button.default,
+.default {
     color: var(--text-inverse) !important;
 }
 
@@ -197,7 +207,9 @@
     color: var(--text-primary);
 }
 
-.vTextField, .vTextarea, select {
+.vTextField,
+.vTextarea,
+select {
     background: var(--input-bg);
     color: var(--input-text);
     border: 1px solid var(--input-border);
@@ -206,7 +218,9 @@
     transition: border-color 0.3s ease;
 }
 
-.vTextField:focus, .vTextarea:focus, select:focus {
+.vTextField:focus,
+.vTextarea:focus,
+select:focus {
     border-color: var(--input-focus);
     outline: none;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -215,13 +229,16 @@
 }
 
 /* Form labels */
-.form-row label, .form-label, label {
+.form-row label,
+.form-label,
+label {
     color: var(--text-secondary);
     font-weight: 500;
 }
 
 /* Fieldset labels */
-.field-box label, .aligned label {
+.field-box label,
+.aligned label {
     color: var(--text-secondary) !important;
 }
 
@@ -448,16 +465,16 @@ fieldset.module .form-row {
     #header h1 {
         font-size: 18px;
     }
-    
+
     .module {
         margin-bottom: 15px;
     }
-    
+
     #searchbar {
         width: 100%;
         max-width: 250px;
     }
-    
+
     #searchbar:focus {
         width: 100%;
         max-width: 280px;
@@ -489,7 +506,8 @@ body {
 }
 
 /* Messages with proper contrast */
-.success, .messagelist .success {
+.success,
+.messagelist .success {
     background: var(--success-gradient);
     color: var(--text-inverse) !important;
     padding: 12px 20px;
@@ -498,7 +516,9 @@ body {
     border: none;
 }
 
-.error, .messagelist .error, .errorlist {
+.error,
+.messagelist .error,
+.errorlist {
     background: var(--error-gradient);
     color: var(--text-inverse) !important;
     padding: 12px 20px;
@@ -507,7 +527,8 @@ body {
     border: none;
 }
 
-.info, .messagelist .info {
+.info,
+.messagelist .info {
     background: var(--primary-gradient);
     color: var(--text-inverse) !important;
     padding: 12px 20px;
@@ -516,7 +537,8 @@ body {
     border: none;
 }
 
-.warning, .messagelist .warning {
+.warning,
+.messagelist .warning {
     background: var(--accent-gradient);
     color: var(--text-inverse) !important;
     padding: 12px 20px;
@@ -553,7 +575,8 @@ body {
 }
 
 /* Help text */
-.help, .help-text {
+.help,
+.help-text {
     color: var(--text-muted);
 }
 
@@ -580,4 +603,350 @@ th {
 /* Form errors */
 ul.errorlist li {
     color: var(--text-inverse);
+}
+
+/* =========================================================================
+   ENHANCED ADMIN DESIGN - ADDITIONAL STYLES
+   ========================================================================= */
+
+/* Smooth page transitions */
+#content,
+.module,
+fieldset,
+#result_list,
+#changelist-filter {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* App modules on dashboard - card layout */
+#content-main .app-portfolio_site_config .module,
+#content-main .module {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px var(--shadow-light);
+    margin-bottom: 24px;
+    overflow: hidden;
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+#content-main .module:hover {
+    box-shadow: 0 8px 30px var(--shadow-medium);
+}
+
+/* App label styling in sidebar/dashboard */
+.module caption,
+.app-label {
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-secondary);
+}
+
+/* Enhanced table row links */
+#result_list tbody td a {
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+#result_list tbody td a:hover {
+    color: #764ba2;
+    text-decoration: none;
+}
+
+/* Better submit row (save buttons) */
+.submit-row {
+    background: var(--bg-primary) !important;
+    border-top: 2px solid var(--border-color);
+    padding: 16px 20px !important;
+    border-radius: 0 0 12px 12px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.submit-row input[type="submit"] {
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.submit-row .deletelink {
+    background: var(--error-gradient) !important;
+    color: white !important;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.submit-row .deletelink:hover {
+    opacity: 0.85;
+    transform: translateY(-2px);
+}
+
+/* Delete confirmation page */
+.delete-confirmation {
+    background: var(--bg-primary);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 20px var(--shadow-light);
+}
+
+/* Inline admin (tabular/stacked) */
+.inline-group {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px var(--shadow-light);
+}
+
+.inline-group h2 {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 14px 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.inline-related {
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px 20px;
+}
+
+.inline-related:last-child {
+    border-bottom: none;
+}
+
+/* Add another link styling */
+.inline-group .add-row a,
+.add-row a {
+    color: var(--input-focus);
+    font-weight: 600;
+    text-decoration: none;
+    padding: 10px 20px;
+    display: inline-block;
+    transition: all 0.2s ease;
+}
+
+.add-row a:hover {
+    color: #764ba2;
+}
+
+/* Filter horizontal (M2M) widget */
+.selector {
+    background: var(--bg-primary);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.selector .selector-available,
+.selector .selector-chosen {
+    background: var(--bg-primary);
+}
+
+.selector .selector-available h2,
+.selector .selector-chosen h2 {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 8px 8px 0 0;
+}
+
+.selector select {
+    background: var(--input-bg);
+    color: var(--input-text);
+    border: 1px solid var(--border-color);
+    border-radius: 0 0 8px 8px;
+}
+
+/* Date hierarchy bar */
+.xfull {
+    background: var(--bg-primary);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+}
+
+/* Object tools (Add Another / History) */
+.object-tools {
+    margin: 0 0 20px;
+    padding: 0;
+}
+
+.object-tools li {
+    margin-left: 12px;
+}
+
+.object-tools a {
+    border-radius: 8px !important;
+    padding: 8px 16px !important;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.object-tools a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-medium);
+}
+
+/* Related widget wrapper (pencil/plus icons) */
+.related-widget-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.related-widget-wrapper select {
+    flex: 1;
+}
+
+/* Change list actions bar */
+.actions {
+    background: var(--bg-primary);
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px var(--shadow-light);
+}
+
+.actions select {
+    border-radius: 6px;
+    padding: 8px 12px;
+    background: var(--input-bg);
+    color: var(--input-text);
+    border: 1px solid var(--input-border);
+}
+
+.actions button {
+    border-radius: 6px;
+    margin-left: 8px;
+}
+
+/* Readonly fields */
+.readonly,
+.form-row .readonly {
+    background: var(--bg-tertiary);
+    padding: 8px 14px;
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* Help text styling */
+.help,
+p.help {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-style: italic;
+}
+
+/* Collapse toggle */
+fieldset.collapse .collapse-toggle {
+    color: var(--input-focus);
+    font-weight: 600;
+}
+
+/* Calendar and clock widgets */
+.calendarbox,
+.clockbox {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px var(--shadow-medium);
+}
+
+/* TinyMCE container styling */
+.tox.tox-tinymce {
+    border-radius: 8px !important;
+    border: 1px solid var(--border-color) !important;
+    overflow: hidden;
+}
+
+/* Changelist header (model name) */
+#content h1 {
+    font-weight: 300;
+    font-size: 28px;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+}
+
+/* Empty changelist */
+#changelist .paginator {
+    border: none;
+    background: transparent;
+}
+
+/* Login page */
+#login-form {
+    background: var(--bg-primary);
+    border-radius: 12px;
+    box-shadow: 0 8px 40px var(--shadow-medium);
+    padding: 30px;
+}
+
+#login-form input[type="text"],
+#login-form input[type="password"] {
+    background: var(--input-bg);
+    color: var(--input-text);
+    border: 2px solid var(--input-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+#login-form input[type="text"]:focus,
+#login-form input[type="password"]:focus {
+    border-color: var(--input-focus);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+#login-form input[type="submit"] {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+/* Scrollbar styling for admin */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
 }

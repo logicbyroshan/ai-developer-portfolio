@@ -2,130 +2,224 @@
 {% load static %}
 
 {% block extrastyle %}
-    {{ block.super }}
-    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/custom_admin.css' %}">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/custom_admin.css' %}">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block extrahead %}
-    {{ block.super }}
-    <style>
-        .admin-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .stat-number {
-            font-size: 2.5em;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .stat-label {
-            font-size: 0.9em;
-            opacity: 0.9;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
+{{ block.super }}
+<style>
+    .admin-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .stat-card {
+        color: white;
+        padding: 24px 20px;
+        border-radius: 14px;
+        text-align: center;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2);
+    }
+
+    .stat-card:hover::before {
+        transform: scale(1.5);
+    }
+
+    .stat-card:nth-child(1) {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .stat-card:nth-child(2) {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+
+    .stat-card:nth-child(3) {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .stat-card:nth-child(4) {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+
+    .stat-icon {
+        font-size: 28px;
+        margin-bottom: 8px;
+        opacity: 0.9;
+    }
+
+    .stat-number {
+        font-size: 2.8em;
+        font-weight: 800;
+        margin-bottom: 4px;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.85em;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        font-weight: 500;
+    }
+
+    .quick-actions {
+        background: var(--bg-primary, white);
+        padding: 28px;
+        border-radius: 14px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 28px;
+    }
+
+    .quick-actions h3 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: var(--text-primary, #333);
+        border-bottom: 3px solid #667eea;
+        padding-bottom: 12px;
+        font-weight: 600;
+        font-size: 18px;
+    }
+
+    .action-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 14px;
+    }
+
+    .action-btn {
+        color: white;
+        padding: 16px 18px;
+        text-decoration: none;
+        border-radius: 12px;
+        text-align: center;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .action-btn:nth-child(1) {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .action-btn:nth-child(2) {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+
+    .action-btn:nth-child(3) {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .action-btn:nth-child(4) {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+
+    .action-btn:nth-child(5) {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .action-btn:nth-child(6) {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+
+    .action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        color: white;
+        text-decoration: none;
+        filter: brightness(1.05);
+    }
+
+    .action-btn i {
+        font-size: 16px;
+    }
+
+    @media (prefers-color-scheme: dark) {
         .quick-actions {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+            background: var(--bg-primary, #1a202c);
         }
-        
+
         .quick-actions h3 {
-            margin-top: 0;
-            color: #333;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
+            color: var(--text-primary, #f7fafc);
         }
-        
-        .action-buttons {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .action-btn {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            padding: 15px 20px;
-            text-decoration: none;
-            border-radius: 8px;
-            text-align: center;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-        
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4);
-            color: white;
-        }
-        
-        .action-btn i {
-            margin-right: 8px;
-        }
-    </style>
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-    <div class="admin-stats">
-        <div class="stat-card">
-            <div class="stat-number">{{ total_projects|default:"0" }}</div>
-            <div class="stat-label">Total Projects</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">{{ total_blogs|default:"0" }}</div>
-            <div class="stat-label">Blog Posts</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">{{ total_comments|default:"0" }}</div>
-            <div class="stat-label">Comments</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">{{ total_contacts|default:"0" }}</div>
-            <div class="stat-label">Contact Messages</div>
-        </div>
+<div class="admin-stats">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-code"></i></div>
+        <div class="stat-number">{{ total_projects|default:"0" }}</div>
+        <div class="stat-label">Projects</div>
     </div>
-
-    <div class="quick-actions">
-        <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
-        <div class="action-buttons">
-            <a href="{% url 'admin:portfolio_project_add' %}" class="action-btn">
-                <i class="fas fa-plus"></i> Add New Project
-            </a>
-            <a href="{% url 'admin:blog_blog_add' %}" class="action-btn">
-                <i class="fas fa-edit"></i> Write Blog Post
-            </a>
-            <a href="{% url 'admin:portfolio_contactsubmission_changelist' %}" class="action-btn">
-                <i class="fas fa-envelope"></i> View Messages
-            </a>
-            <a href="{% url 'admin:portfolio_siteconfiguration_changelist' %}" class="action-btn">
-                <i class="fas fa-cog"></i> Site Settings
-            </a>
-        </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-pen-nib"></i></div>
+        <div class="stat-number">{{ total_blogs|default:"0" }}</div>
+        <div class="stat-label">Blog Posts</div>
     </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-comments"></i></div>
+        <div class="stat-number">{{ total_comments|default:"0" }}</div>
+        <div class="stat-label">Comments</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-envelope-open-text"></i></div>
+        <div class="stat-number">{{ total_contacts|default:"0" }}</div>
+        <div class="stat-label">Messages</div>
+    </div>
+</div>
 
-    {{ block.super }}
+<div class="quick-actions">
+    <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+    <div class="action-buttons">
+        <a href="{% url 'admin:portfolio_project_add' %}" class="action-btn">
+            <i class="fas fa-plus-circle"></i> New Project
+        </a>
+        <a href="{% url 'admin:blog_blog_add' %}" class="action-btn">
+            <i class="fas fa-edit"></i> Write Blog
+        </a>
+        <a href="{% url 'admin:portfolio_contactsubmission_changelist' %}" class="action-btn">
+            <i class="fas fa-inbox"></i> Messages
+        </a>
+        <a href="{% url 'admin:portfolio_siteconfiguration_changelist' %}" class="action-btn">
+            <i class="fas fa-cog"></i> Site Settings
+        </a>
+        <a href="{% url 'admin:roshan_aboutmeconfiguration_changelist' %}" class="action-btn">
+            <i class="fas fa-user-edit"></i> About Me
+        </a>
+        <a href="{% url 'admin:portfolio_skill_changelist' %}" class="action-btn">
+            <i class="fas fa-laptop-code"></i> Skills
+        </a>
+    </div>
+</div>
+
+{{ block.super }}
 {% endblock %}

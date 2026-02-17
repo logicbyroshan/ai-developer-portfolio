@@ -10,21 +10,22 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='spotifytrack',
-            name='playlist',
-        ),
+        # Delete Spotify models - delete dependent models first, then parents
         migrations.DeleteModel(
             name='SpotifyToken',
         ),
-        migrations.AlterUniqueTogether(
-            name='spotifytrack',
-            unique_together=None,
+        migrations.DeleteModel(
+            name='SpotifyTrack',
         ),
+        migrations.DeleteModel(
+            name='SpotifyPlaylist',
+        ),
+        # Remove spotify_url from ManualTrack
         migrations.RemoveField(
             model_name='manualtrack',
             name='spotify_url',
         ),
+        # Alter remaining fields
         migrations.AlterField(
             model_name='manualplaylist',
             name='is_featured',
@@ -49,11 +50,5 @@ class Migration(migrations.Migration):
             model_name='resource',
             name='is_featured',
             field=models.BooleanField(db_index=True, default=False, help_text='Display this resource prominently'),
-        ),
-        migrations.DeleteModel(
-            name='SpotifyPlaylist',
-        ),
-        migrations.DeleteModel(
-            name='SpotifyTrack',
         ),
     ]

@@ -155,6 +155,6 @@ class NotificationSettingsAdmin(admin.ModelAdmin):
         return super().changelist_view(request, extra_context)
 
 # Custom admin site configuration
-admin.site.site_header = "Portfolio Notification Management"
-admin.site.site_title = "Notifications Admin"
-admin.site.index_title = "Manage Email Notifications"
+admin.site.site_header = "Roshan Damor — Portfolio Admin"
+admin.site.site_title = "Portfolio Admin"
+admin.site.index_title = "Dashboard"
