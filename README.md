@@ -501,6 +501,8 @@ _(Full list available in `requirements.txt`.)_
 - ✅ **Automated Image Optimization** — All uploaded images are automatically compressed and converted to WebP format to ensure ultra-fast load times.
 - ✅ **Security Hardening** — Implemented strict Content-Security-Policy (CSP), Permissions-Policy, and Rate-Limiting across the dashboard and API endpoints.
 - ✅ **CSS Architecture Overhaul** — Consolidated 300+ lines of duplicate CSS into centralized components.
+- ✅ **Template Componentization** — Refactored the entire frontend Django template structure into modular, reusable components (Headers, Footers, Modals, Pagination), heavily reducing code duplication.
+- ✅ **CSP-Compliant Assets** — Updated third-party dependencies (like FontAwesome) to utilize strict CDN links that comply with the newly enforced Content-Security-Policy.
 - ✅ **Responsive Optimization** — Enhanced mobile experience with better spacing and typography.
 - ✅ **Blog System** — Completely separated blog functionality into dedicated Django app.
 - ✅ **Animation System** — Unified data-animation system across all pages.
