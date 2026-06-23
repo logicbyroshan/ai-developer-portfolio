@@ -252,7 +252,6 @@
             <div class="blog-image">
                 <img src="{% if blog.cover_image %}{{ blog.cover_image.url }}{% else %}https://placehold.co/600x400/010409/eaeaea?text={{ blog.title|urlencode }}{% endif %}"
                     alt="{{ blog.title }}">
-                <div class="read-time"><span class="teg">{{ blog.reading_time }} min read</span></div>
             </div>
             <div class="blog-content">
                 <h4>{{ blog.title }}</h4>
@@ -260,10 +259,7 @@
             </div>
             <div class="blog-footer">
                 <div class="publisher">
-                    {% if blog.author_avatar %}
-                    <img src="{{ blog.author_avatar.url }}" alt="{{ blog.author_name }}">
-                    {% endif %}
-                    <span>{{ blog.author_name }}</span>
+                    <span class="teg">{{ blog.reading_time }} min read</span>
                 </div>
                 <span class="blog-date">{{ blog.created_date|date:"M d, Y" }}</span>
             </div>

@@ -113,19 +113,14 @@ Blog - Web Development & AI Insights by Roshan Damor
             {% for blog in blogs %}
             <div class="blog-card card clickable-card" data-animation="zoom-in"
                 data-url="{% url 'blog:blog_detail' slug=blog.slug %}">
-                <div class="blog-image"><img src="{% if blog.cover_image %}{{ blog.cover_image.url }}{% else %}https://placehold.co/600x400/010409/eaeaea?text={{ blog.title|urlencode }}{% endif %}" alt="{{ blog.title }}"><div class="read-time"><span class="teg">{{ blog.reading_time }} min read</span></div></div>
+                <div class="blog-image"><img src="{% if blog.cover_image %}{{ blog.cover_image.url }}{% else %}https://placehold.co/600x400/010409/eaeaea?text={{ blog.title|urlencode }}{% endif %}" alt="{{ blog.title }}"></div>
                 <div class="blog-content">
                     <h4>{{ blog.title }}</h4>
                     <p>{{ blog.summary|truncatewords:20|safe }}</p>
                 </div>
                 <div class="blog-footer">
                     <div class="publisher">
-                        {% if blog.author_avatar %}
-                            <img src="{{ blog.author_avatar.url }}" alt="{{ blog.author_name }}">
-                        {% else %}
-                            <img src="{% static 'images/default_avatar.png' %}" alt="Default Avatar">
-                        {% endif %}
-                        <span>{{ blog.author_name }}</span>
+                        <span class="teg">{{ blog.reading_time }} min read</span>
                     </div>
                     <span class="blog-date">{{ blog.created_date|date:"M d, Y" }}</span>
                 </div>
